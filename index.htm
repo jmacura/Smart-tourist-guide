@@ -1,0 +1,94 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!doctype html>
+<html dir="ltr" lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="author" content="jmacura 2016">
+	<meta name="robots" content="index, follow">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Smart Tourist Guide</title>
+	<link rel="stylesheet" href="jquery-ui.min.css">
+	<link rel="stylesheet" href="leaflet.css">
+	<link rel="stylesheet" href="styles.css">
+	<script src="jquery-3.1.1.min.js"></script>
+	<script src="jquery-ui.min.js"></script>
+	<script src="leaflet.js"></script>
+	<script src="skript.js" charset="utf-8"></script>
+</head>
+
+<body lang="cs">
+<main>
+
+<header>
+	<h1><a href="#">(Not so) <em class="blue">Smart</em> tourist guide</a></h1>
+</header>
+
+<div id="content">
+	<h2>Search for Points Of Interest:</h2>
+	<section class="boxes">
+	<div class="box" onclick="animateBox(this);">
+		<img src="images/signpost.svg" title="Designed by Freepik from Flaticon" alt="Search by location name">
+		<p class="desc">Search by location name</p>
+		<form id="search-by-name">
+			<fieldset>
+				<legend>Fill in your destination name</legend>
+				<input type="text" name="place" value="Plzen">
+				<input type="submit" value="Search">
+			</fieldset>
+		</form><br>
+		<div id="digestLoader" class="progressbar"></div>
+		<div class="digest" id="digest-block">
+		</div>
+	</div>
+
+	<div class="box" onclick="animateBox(this);">
+		<img src="images/flag.svg" title="Designed by Freepik from Flaticon" alt="Search by given coordinates">
+		<p class="desc">Search by given coordinates</p>
+		<form id="search-by-latlon">
+			<fieldset>
+				<legend>Search by coordinates</legend>
+				latitude: <input type="text" name="lat" value="49.727"><br>
+				longitude: <input type="text" name="lon" value="13.352"><br>
+				radius: <input type="text" name="r" value="1"> km<br>
+				<input type="submit" value="Search">
+			</fieldset>
+		</form>
+	</div>
+
+	<div class="box" onclick="animateBox(this);">
+		<img src="images/position.svg" title="Designed by Freepik from Flaticon" alt="Search around your position">
+		<p class="desc">Search around your position</p>
+		<form id="search-by-position">
+			<fieldset>
+				<legend>Search for POIs around me</legend>
+				radius: <input type="text" name="r" value="2"> km<br>
+				<input type="submit" value="Tell my location and search">
+			</fieldset>
+		</form>
+	</div>
+	</section>
+
+	<section>
+	<div id="resultsLoader" class="progressbar"></div>
+	<div id="info-block"><p>&nbsp;</p></div>
+	</section>
+
+	<footer>
+		<div class="logo">
+			<img src="logo_web.svg" alt="author's logo">
+		</div>
+		<div class="credits">
+			Data in this page originates from <a href="http://sdi4apps.eu/spoi/">SPOI</a> dataset and are licensed under <a href="http://opendatacommons.org/licenses/odbl/">Open Database License</a>.<br>
+			Icons in this page are used from <a href="http://www.flaticon.com">Flaticon</a> and are subject to <a href="http://file000.flaticon.com/downloads/license/license.pdf">Flaticon Basic License</a>.<br>
+			Source code of this app is licensed under a <a rel="license" href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public License Version 2.0</a>.<br>
+			<p>Author: Jan Macura, 2016</p>
+			<p>University of West Bohemia, <a href="http://www.fav.zcu.cz/en">Faculty of Applied Sciences</a></p>
+		</div>
+	</footer>
+</div>
+
+</main>
+</body>
+</html>
