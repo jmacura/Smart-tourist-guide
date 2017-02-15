@@ -18,7 +18,7 @@ h1 em {color: rgb(0, 142, 214); font-style: normal; transition: color 0.5s;}
 main {position: absolute; width: 100%; margin: 0; padding: 0;}
 p {margin: 5pt 0 5pt 0;}
 
-.box {display: inline-block; vertical-align: bottom; margin: 10px; width: 30%; max-width: 350px; padding-bottom: 30px; background: rgb(0, 142, 214); transition: background 0.5s;}
+.box {display: inline-block; vertical-align: bottom; margin: 10px; width: 100%; max-width: 350px; padding-bottom: 30px; background: rgb(0, 142, 214); transition: background 0.5s;}
 .box:before {content: ''; padding-bottom: 124.57%; float:left;}
 .box:after {content: ''; display: table; clear: both;}
 .box:hover {background: rgb(69, 69, 69); cursor: pointer;}
