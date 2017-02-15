@@ -201,7 +201,7 @@ function getCats() {
 			var ls = document.createElement("UL");
 			for(var i = 0; i < catz.length; i++) {
 				var cat = catz[i].Concept.value.slice(32);
-				console.log(cat);
+				//console.log(cat);
 				var li = document.createElement("INPUT");
 				li.setAttribute("type", 'checkbox');
 				li.setAttribute("value", cat);
@@ -399,8 +399,15 @@ function preprocess(arr) {
 	console.log(arr);
 	var obj = {};
 	for(var i = 0; i <arr.length; i++) {
-		//linkThing.value;
+		if(arr[i].linkThing.value) {
+			console.log("duplicity!");
+			//obj[arr[i].]
+		}
+		else {
+			obj[arr[i].linkThing.value] = arr[i];
+		}
 	}
+	console.log(obj);
 	return arr;
 }
 
@@ -465,7 +472,7 @@ function filter(e) {
 	var cat = e.target.value;
 	console.log(cat);
 	var lines = document.getElementsByClassName(cat);
-	if(lines[0].style.display != 'none') {
+	if(lines[0] && lines[0].style.display != 'none') {
 		for(var i = 0; i < lines.length; i++) {
 			lines[i].style.display = 'none';
 		}
