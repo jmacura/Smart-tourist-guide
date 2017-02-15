@@ -2,10 +2,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-// @author: jmacura 2016
+// @author: jmacura 2016-2017
 
 // global variables
 var destination = null;
+var cats = false;
 
 //defining Event Handlers
 $(document).ready(function(e) {
@@ -156,7 +157,7 @@ function searchLocation(input) {
 		"?linkThing ogcgs:asWKT ?sg;\n" +
 		" rdfs:label ?name.\n" +
 		" FILTER(bif:st_intersects (?sg, bif:st_point (" + input[1] + ", " + input[0] + "), " + input[2] + ")).\n" +
-		" OPTIONAL {?linkThing poi:category ?category .}\n" +
+		" OPTIONAL {?linkThing poi:class ?category .}\n" +
 		"}";
 	console.log(query);
 	var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
@@ -167,13 +168,54 @@ function searchLocation(input) {
 			console.log(status + err);
 		},
 		success: function(data) {
-			var POIs = data.results.bindings;
 			//console.log(data);
+			var POIs = preprocess(data.results.bindings);
 			showInfo(input, data.head.vars, POIs);
 			killProgressbar("resultsLoader");
 		}
 	});
 	//this.reset();
+}
+
+// **** Get  the list of Categories (Classes) from SPOI ****
+function getCats() {
+	if(cats) {return;};
+	cats = true;
+	document.getElementById("catFilter").style.visibility = 'visible';
+	runProgressbar('catProgress');
+	var url = 'http://data.plan4all.eu/sparql';
+	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
+	"SELECT DISTINCT ?Concept WHERE {?obj poi:class ?Concept}";
+	console.log(query);
+	var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
+	$.ajax({
+		dataType: 'json',
+		url: queryUrl,
+		error: function(jqXHR, status, err) {
+			console.log(status + err);
+		},
+		success: function(data) {
+			var catz = data.results.bindings;
+			killProgressbar('catProgress');
+			var catFilter = document.getElementById("catFilter");
+			var ls = document.createElement("UL");
+			for(var i = 0; i < catz.length; i++) {
+				var cat = catz[i].Concept.value.slice(32);
+				console.log(cat);
+				var li = document.createElement("INPUT");
+				li.setAttribute("type", 'checkbox');
+				li.setAttribute("value", cat);
+				li.setAttributeNode(document.createAttribute("checked"));
+				li.addEventListener('change', filter);
+				ls.appendChild(li);
+				ls.appendChild(document.createTextNode(cat));
+				ls.appendChild(document.createElement("BR"));
+			}
+			catFilter.appendChild(ls);
+			//showInfo(input, data.head.vars, POIs);
+			//killProgressbar("resultsLoader");
+		}
+	});
 }
 
 // **** Background support for displaying info ****
@@ -271,13 +313,30 @@ function showInfo(input, headers, points) { //points is the array of data
 		}
 	});
 
+//Category filtering
+	var catFilter = document.createElement("DIV");
+	catFilter.setAttribute("id", 'catFilter');
+	var catProg = document.createElement("DIV");
+	catProg.setAttribute("class", 'progressbar');
+	catProg.setAttribute("id", 'catProgress');
+	catFilter.appendChild(catProg);
+	//catFilter.addEventListener('mouseover', getCats);
+
 	ls = document.createElement("TABLE");
 	//set headers
 	r = document.createElement("TR");
 	for(var i = 0; i < heads[1].length; i++) {
 		d = document.createElement("TH");
 		t = document.createTextNode(heads[1][i]);
-		d.appendChild(t); r.appendChild(d);
+		d.appendChild(t);
+		if(heads[1][i] == "category") {
+			var aCat = document.createElement("A");
+			aCat.setAttribute("href", '#');
+			aCat.appendChild(document.createTextNode('(Filter)'));
+			aCat.addEventListener('click', getCats);
+			d.appendChild(aCat);
+		}
+		r.appendChild(d);
 	}
 	ls.appendChild(r);
 
@@ -298,7 +357,15 @@ function showInfo(input, headers, points) { //points is the array of data
 			a.setAttribute("name", objName);
 			d.appendChild(a);
 			//console.log(j, heads[1][j]);
-			t = document.createTextNode( (points[i][heads[1][j]]) ? points[i][heads[1][j]].value : '---');
+			/*If the line contains # sign => it is category*/
+			if(points[i][heads[1][j]].value.includes('#')) {
+				r.setAttribute("class", points[i][heads[1][j]].value.slice(32)); // if there is a category for given point => save it to the class attribute of corresponding row
+				var txt = points[i][heads[1][j]].value.slice(32).replace(/_/g, ' '); //Prettyprint categories
+			}
+			else {
+				var txt = points[i][heads[1][j]].value; // If the object hase no name => print ---
+			}
+			t = document.createTextNode( (points[i][heads[1][j]]) ? txt : '---');
 			if(heads[0][j]) {
 				l = document.createElement("A");
 				l.setAttribute("href", points[i][heads[0][j]].value);
@@ -321,12 +388,22 @@ function showInfo(input, headers, points) { //points is the array of data
 	}*/
 	//append new information
 	infoBlock.insertBefore(ls, infoBlock.firstChild);
+	infoBlock.insertBefore(catFilter, infoBlock.firstChild);
 	infoBlock.insertBefore(charts, infoBlock.firstChild);
 	infoBlock.insertBefore(nfo, infoBlock.firstChild);
 }
 
+//Handle duplicates
+function preprocess(arr) {
+	console.log(arr);
+	var obj = {};
+	for(var i = 0; i <arr.length; i++) {
+		//linkThing.value;
+	}
+	return arr;
+}
 
-//distinct things and their links
+//distinct things and their links <-- too complex, too generic, needs refactoring
 function thingsAndLinks(arr) {
 	//console.log(arr);
 	if(! (arr instanceof Array)) {console.log("no way!"); return;}
@@ -381,6 +458,22 @@ function navigateTo(e) {
 	document.location = '#' + name;
 	var ele = document.getElementsByName(name)[0];
 	ele.parentNode.parentNode.style.background = '#ddffdd';
+}
+
+function filter(e) {
+	var cat = e.target.value;
+	console.log(cat);
+	var lines = document.getElementsByClassName(cat);
+	if(lines[0].style.display != 'none') {
+		for(var i = 0; i < lines.length; i++) {
+			lines[i].style.display = 'none';
+		}
+	}
+	else {
+		for(var i = 0; i < lines.length; i++) {
+			lines[i].style.display = 'table-row';
+		}
+	}
 }
 
 /**
