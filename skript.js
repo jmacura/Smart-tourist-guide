@@ -282,12 +282,13 @@ function showInfo(input, headers, points) { //points is the array of data
 	ls.appendChild(r);
 
 	//print POIs
-	for(var i = 0; i < points.length; i++) {
+	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', 163, 61)';
+    for(var i = 0; i < points.length; i++) {
 		var objName = points[i]['linkThing'].value.split('#')[1];
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
-		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: 'rgb(0, 163, 61)'});
+		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
 		m.name = objName;
 		m.on('click', navigateTo);
 		m.addTo(map);
