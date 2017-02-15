@@ -44,10 +44,12 @@ p {margin: 5pt 0 5pt 0;}
 /*#catFilter:hover {visibility: visible;}*/
 #content {margin: calc(10pt + 1.7em + 20pt) 0 0 0; max-width: 100%; padding: 10pt; color: #555555;}
 #charts {margin: 0 auto; height: 330px; width: 100%;}
-#forecast {margin-left: 51%; height: 100%; width: 49%; box-shadow: 0 3px 6px rgba(180, 180, 180, 0.7);}
+#forecast {height: 100%; width: 100%;}
 #forecast img {width: 100%;}
 #info-block table {margin: 0 auto;}
 #info-block th {background: rgb(0, 142, 214); color: white;}
 #info-block th a {color: white; padding-left: 10%;}
 #info-block td {padding-right: 10pt; background: rgb(244, 244, 244);}
 #map {float: left; margin: 0 0 0 1%; height: 100%; width: 49%; box-shadow: 0 3px 6px rgba(180, 180, 180, 0.7); z-index: 1;}
+
+#mapid {margin-top: 20px; margin-bottom: 20px;  height: 350px; width: 100%; z-index: 1; }

@@ -70,7 +70,17 @@
 		</form>
 	</div>
 	</section>
-
+    <div id="mapid"></div>
+        <script>
+  
+        var mymap = L.map('mapid').setView([49.727, 13.352], 13);
+            
+            L.tileLayer('http://{s}.tiles.mapbox.com/v3/yjm.j5j87g72/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+           }).addTo(mymap);
+        
+        </script>
 	<section>
 	<div id="resultsLoader" class="progressbar"></div>
 	<div id="info-block"><p>&nbsp;</p></div>

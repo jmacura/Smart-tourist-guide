@@ -170,6 +170,7 @@ function searchLocation(input) {
 		success: function(data) {
 			//console.log(data);
 			var POIs = preprocess(data.results.bindings);
+            mymap.setView([input[0], input[1]], 12);
 			showInfo(input, data.head.vars, POIs);
 			killProgressbar("resultsLoader");
 		}
@@ -239,6 +240,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	charts.setAttribute("id", 'charts');
 
 	//create map
+    /*
 	var mappa = document.createElement("DIV");
 	mappa.setAttribute("id", 'map');
 	charts.appendChild(mappa);
@@ -252,14 +254,14 @@ function showInfo(input, headers, points) { //points is the array of data
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://mapbox.com">Mapbox</a>',
 		maxZoom: 18
 	}).addTo(map);
-
+*/
 
 	//create block for weather forecast
 	var forecast = document.createElement("DIV");
 	forecast.setAttribute("id", 'forecast');
 	charts.appendChild(forecast);
-	//phpUrl = './getWeather.php?lat=' + input[0] + '&lon=' + input[1];
-	phpUrl = 'predpoved2.xml'; //ONLY FOR LOCAL TESTINGS
+	phpUrl = './getWeather.php?lat=' + input[0] + '&lon=' + input[1];
+	//phpUrl = 'predpoved2.xml'; //ONLY FOR LOCAL TESTINGS
 	$.ajax({
 		dataType: 'xml',
 		url: phpUrl,
@@ -274,8 +276,9 @@ function showInfo(input, headers, points) { //points is the array of data
 			var weather = parseWeather(obj); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
 			//console.log(weather);
 			var h = document.createElement("H3");
+            h.setAttribute("style", 'text-align: center;');
 			h.appendChild(document.createTextNode('Weather forecast in the location for the upcoming 48 hours'));
-			forecast.appendChild(h);
+           	forecast.appendChild(h);
 			r = document.createElement("TR");
 			for(var i = 0; i < weather.length; i++) {
 				d = document.createElement("TD");
@@ -308,6 +311,7 @@ function showInfo(input, headers, points) { //points is the array of data
 			forecast.appendChild(tab);
 			p = document.createElement("P");
 			p.setAttribute("style", 'font-size: small;');
+            p.setAttribute("style", 'text-align: center;');
 			p.appendChild(document.createTextNode('Weather forecast from Yr, delivered by the Norwegian Meteorological Institute and NRK'));
 			forecast.appendChild(p);
 		}
@@ -350,7 +354,7 @@ function showInfo(input, headers, points) { //points is the array of data
 		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
 		m.name = objName;
 		m.on('click', navigateTo);
-		m.addTo(map);
+		m.addTo(mymap);
 		//console.log(lat, lng);
 		for(var j = 0; j < heads[1].length; j++) {
 			d = document.createElement("TD");
