@@ -62,7 +62,7 @@ p {margin: 5pt 0 5pt 0;}
 #mapid {margin-top: 0px; margin-bottom: 20px;  height: 400px; width: 100%; z-index: 1;  }
 .subtitle {font-size: 40px; text-shadow: 2px 2px 5px #808080; margin-bottom: 20px; }
 .sdi4apps-logo{ width: 150px; margin-top: 16px; padding-bottom: 10px;}
-.title-area{max-width: 1000px; margin: 0 auto;  margin-top: 150px; }
+.title-area{max-width: 1000px; margin: 0 auto;  margin-top: 150px; border-radius: 25px !important;}
 
 #background{ width: 100%;  background: url(foto2.jpg) no-repeat; background-size: cover; height: auto;}
 .btn{margin-top: 10px !important;}
