@@ -75,6 +75,6 @@ p {margin: 5pt 0 5pt 0;}
 .search-table a{color: #009EE0;}
 .search-table a:hover{color: #eff2f5; text-decoration: none;}
 
-#scroll-to{border: 0px; width: 100%; height: 100px;}
+#scroll-to{border: 0px; margin-top: 20px; width: 100%; height: 100px;}
 .header-rows{text-align: center; }
 .form-control{margin-bottom: 5px !important; margin-top: 2px !important;}
