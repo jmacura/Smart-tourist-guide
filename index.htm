@@ -9,34 +9,60 @@
 	<meta name="robots" content="index, follow">
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<title>Smart Tourist Guide</title>
+    
+    <script src="jquery-3.1.1.min.js"></script>
+	<script src="jquery-ui.min.js"></script>
+    <script src="tokml.js"></script>
+    <script src="skript.js" charset="utf-8"></script>
+    
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">  
 	<link rel="stylesheet" href="jquery-ui.min.css">
 	<link rel="stylesheet" href="leaflet.css">
-	<link rel="stylesheet" href="styles.css">
-	<script src="jquery-3.1.1.min.js"></script>
-	<script src="jquery-ui.min.js"></script>
+
+
+    <script src="bootstrap/js/bootstrap.min.js"></script>   
+
 	<script src="leaflet.js"></script>
-	<script src="tokml.js"></script>
-	<script src="skript.js" charset="utf-8"></script>
+
+
+    
+    
 </head>
 
 <body lang="cs">
 <main>
 
 <header>
-	<h1><a href="#">(Not so) <em class="blue">Smart</em> tourist guide</a></h1>
+	 <div class="container">
+         <div class="row">
+          <div class="col-sm-6"><h1><a href="index.htm">Smart <em>tourist guide</em> <span class="glyphicon glyphicon-globe"></span></a></h1></div>
+          <div class="col-sm-6"><img src="sdi4apps_logo.png" class="sdi4apps-logo"></div>
+        </div>
+    </div>
 </header>
+<div id="background">
+    
+ <div class="container">
+  <div class="jumbotron title-area">
+    <div class="subtitle">Search for Points Of Interest</div> 
+    <p>By location name, given coordinates or around your position.</p> 
+  </div>
+ </div>
 
+
+    
 <div id="content">
-	<h2>Search for Points Of Interest:</h2>
 	<section class="boxes">
 	<div class="box" onclick="animateBox(this);">
 		<img src="images/signpost.svg" title="Designed by Freepik from Flaticon" alt="Search by location name">
 		<p class="desc">Search by location name</p>
-		<form id="search-by-name">
+		<form id="search-by-name"  class="form-group">
 			<fieldset>
 				<legend>Fill in your destination name</legend>
-				<input type="text" name="place" value="Plzen">
-				<input type="submit" value="Search">
+				Location <input class="form-control" type="text" name="place" value="Plzen">
+				<input class="btn btn-default" type="submit" value="Search">
 			</fieldset>
 		</form><br>
 		<div id="digestLoader" class="progressbar"></div>
@@ -47,13 +73,13 @@
 	<div class="box" onclick="animateBox(this);">
 		<img src="images/flag.svg" title="Designed by Freepik from Flaticon" alt="Search by given coordinates">
 		<p class="desc">Search by given coordinates</p>
-		<form id="search-by-latlon">
+		<form id="search-by-latlon" class="form-group">
 			<fieldset>
 				<legend>Search by coordinates</legend>
-				latitude: <input type="text" name="lat" value="49.727"><br>
-				longitude: <input type="text" name="lon" value="13.352"><br>
-				radius: <input type="text" name="r" value="1"> km<br>
-				<input type="submit" value="Search">
+				Latitude <input  class="form-control" type="text" name="lat" value="49.727"><br>
+				Longitude <input  class="form-control" type="text" name="lon" value="13.352"><br>
+				Radius (km)<input  class="form-control" type="text" name="r" value="1"><br>
+				<input class="btn btn-default" type="submit" value="Search">
 			</fieldset>
 		</form>
 	</div>
@@ -61,29 +87,35 @@
 	<div class="box" onclick="animateBox(this);">
 		<img src="images/position.svg" title="Designed by Freepik from Flaticon" alt="Search around your position">
 		<p class="desc">Search around your position</p>
-		<form id="search-by-position">
+		<form id="search-by-position" class="form-group">
 			<fieldset>
 				<legend>Search for POIs around me</legend>
-				radius: <input type="text" name="r" value="2"> km<br>
-				<input type="submit" value="Tell my location and search">
+				Radius <input  class="form-control" type="text" name="r" value="2"><br>
+				<input class="btn btn-default" type="submit" value="Tell my location and search">
 			</fieldset>
 		</form>
 	</div>
 	</section>
+    
+    </div>
+</div>    
+    
     <div id="mapid"></div>
         <script>
   
-        var mymap = L.map('mapid').setView([49.727, 13.352], 13);
+        var mymap = L.map('mapid').setView([49.75, 13.35], 13);
             
-            L.tileLayer('http://{s}.tiles.mapbox.com/v3/yjm.j5j87g72/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
+            attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             maxZoom: 18
            }).addTo(mymap);
         
         </script>
 	<section>
 	<div id="resultsLoader" class="progressbar"></div>
-	<div id="info-block"><p>&nbsp;</p></div>
+        <div class="container">
+	           <div id="info-block"><p>&nbsp;</p></div>
+          </div>
 	</section>
 
 	<footer>
@@ -98,7 +130,7 @@
 			<p>University of West Bohemia, <a href="http://www.fav.zcu.cz/en">Faculty of Applied Sciences</a></p>
 		</div>
 	</footer>
-</div>
+
 
 </main>
 </body>

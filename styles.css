@@ -6,19 +6,23 @@ a:hover {text-decoration: underline;}
 a:active {/*color: rgb(255, 102, 0);*/ text-decoration: underline;}
 aside {margin-left: 900px; min-width: 150pt;} /* unused */
 body {font-family: 'Open Sans', Helvetica Neue, sans-serif; margin: 0}
-header {position: fixed; top: 0; width: 100%; text-align: center; background: white; z-index: 3; box-shadow: 0 3px 6px rgba(180, 180, 180, 0.7);}
+
+header { width: 100%;  min-height: 100px;  background-color: #009EE0;  position: fixed;  z-index: 1000;  margin: 0px;  padding: 0px;}
+h1 {padding-top: 10px; white-space: nowrap; text-shadow: 1px 2px 3px #808080; font-size: 35px;  }
+h1 a {text-decoration: none; color: #231F20; transition: color 1.5s;}
+h1 a:hover {color: #ffffff; text-decoration: none;}
+h1 a:hover em {color: #231F20;}
+h1 em {color: #ffffff; font-style: normal; transition: color 1.5s;}
+h2 {text-align: center;}
+.form-group legend{color: white; }
+
 footer {margin: 20pt 0 0 0; position: relative; font-size: small;}
 footer p {color: rgb(69, 69, 69);}
-h1 {color: rgb(69, 69, 69); margin-bottom: 10pt; white-space: nowrap; font-size: 1.7em;}
-h1 a {text-decoration: none; color: rgb(69, 69, 69); transition: color 0.5s;}
-h1 a:hover {color: rgb(0, 142, 214); text-decoration: none;}
-h1 a:hover em {color: rgb(69, 69, 69);}
 h3 {margin: 0.5em 1em;}
-h1 em {color: rgb(0, 142, 214); font-style: normal; transition: color 0.5s;}
 main {position: absolute; width: 100%; margin: 0; padding: 0;}
 p {margin: 5pt 0 5pt 0;}
 
-.box {display: inline-block; vertical-align: bottom; margin: 10px; width: 100%; max-width: 350px; padding-bottom: 30px; background: rgb(0, 142, 214); transition: background 0.5s;}
+.box {display: inline-block; vertical-align: bottom; margin: 10px; width: 100%; max-width: 350px; padding-bottom: 30px; background: rgb(0, 142, 214); transition: background 0.5s;   border-radius: 25px;}
 .box:before {content: ''; padding-bottom: 124.57%; float:left;}
 .box:after {content: ''; display: table; clear: both;}
 .box:hover {background: rgb(69, 69, 69); cursor: pointer;}
@@ -40,16 +44,25 @@ p {margin: 5pt 0 5pt 0;}
 .tmin {color: blue;}
 .tmax {color: red;}
 
-#catFilter {float: right; border: 2pt solid red; width: 20%; visibility: hidden;}
+#catFilter {float: right; border: 2pt solid red; width: 20%; display:none;}
 /*#catFilter:hover {visibility: visible;}*/
-#content {margin: calc(10pt + 1.7em + 20pt) 0 0 0; max-width: 100%; padding: 10pt; color: #555555;}
-#charts {margin: 0 auto; height: 330px; width: 100%;}
-#forecast {height: 100%; width: 100%;}
-#forecast img {width: 100%;}
-#info-block table {margin: 0 auto;}
-#info-block th {background: rgb(0, 142, 214); color: white;}
-#info-block th a {color: white; padding-left: 10%;}
-#info-block td {padding-right: 10pt; background: rgb(244, 244, 244);}
-#map {float: left; margin: 0 0 0 1%; height: 100%; width: 49%; box-shadow: 0 3px 6px rgba(180, 180, 180, 0.7); z-index: 1;}
 
-#mapid {margin-top: 20px; margin-bottom: 20px;  height: 350px; width: 100%; z-index: 1; }
+#content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}
+
+#charts {margin: 0 auto; height: 330px; width: 100%; text-align: center;}
+#forecast {height: 100%; width: 100%; text-align: center; margin: 0 auto;}
+#forecast img {width: 100%;}
+#forecast table{margin: 0 auto;}
+
+
+#mapid {margin-top: 0px; margin-bottom: 20px;  height: 400px; width: 100%; z-index: 1;  }
+.subtitle {font-size: 45px; text-shadow: 2px 2px 5px #808080; margin-bottom: 20px; }
+.sdi4apps-logo{ width: 150px; margin-top: 16px; padding-bottom: 10px; margin-left: 20%;}
+.title-area{ margin-top: 140px;}
+
+#background{ width: 100%;  background: url(foto2.jpg) no-repeat; background-size: cover; height: auto;}
+.btn{margin-top: 10px !important;}
+.table-results{width: 60%; margin: 0 auto;}
+.table-results td{padding: 5px; text-transform: capitalize; border-bottom: 1px solid #d1d1d1; width: 60%;}
+.results-heading{padding-bottom: 10px; text-transform: capitalize; border-bottom: 1px solid #606060; width: 60%;}
+.weather-info{font-size: 10px; margin-bottom: 0px;}

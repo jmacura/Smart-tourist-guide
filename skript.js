@@ -170,7 +170,7 @@ function searchLocation(input) {
 		success: function(data) {
 			//console.log(data);
 			var POIs = preprocess(data.results.bindings);
-            mymap.setView([input[0], input[1]], 12);
+            mymap.setView([input[0], input[1]], 13);
 			showInfo(input, data.head.vars, POIs);
 			killProgressbar("resultsLoader");
 		}
@@ -182,7 +182,7 @@ function searchLocation(input) {
 function getCats() {
 	if(cats) {return;};
 	cats = true;
-	document.getElementById("catFilter").style.visibility = 'visible';
+	document.getElementById("catFilter").style.display = 'block';
 	runProgressbar('catProgress');
 	var url = 'http://data.plan4all.eu/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
@@ -227,12 +227,12 @@ function showInfo(input, headers, points) { //points is the array of data
 
 	//print heading
 	nfo = document.createElement("H2");
-	var info = 'Results for "';
+	var info = 'Results for ';
 	for(var i = 0; i < input.length; i++) {
 		if(i > 0) {info += " "};
 		info += input[i];
 	}
-	t = document.createTextNode(info + '":');
+	t = document.createTextNode(info + ':');
 	nfo.appendChild(t);
 
 	
@@ -310,10 +310,12 @@ function showInfo(input, headers, points) { //points is the array of data
 			tab.appendChild(r);
 			forecast.appendChild(tab);
 			p = document.createElement("P");
-			p.setAttribute("style", 'font-size: small;');
+			p.setAttribute("class", 'weather-info');
             p.setAttribute("style", 'text-align: center;');
 			p.appendChild(document.createTextNode('Weather forecast from Yr, delivered by the Norwegian Meteorological Institute and NRK'));
 			forecast.appendChild(p);
+            
+
 		}
 	});
 
@@ -327,16 +329,19 @@ function showInfo(input, headers, points) { //points is the array of data
 	//catFilter.addEventListener('mouseover', getCats);
 
 	ls = document.createElement("TABLE");
+    ls.setAttribute("class", 'table-results');
 	//set headers
 	r = document.createElement("TR");
 	for(var i = 0; i < heads[1].length; i++) {
 		d = document.createElement("TH");
+        d.setAttribute("class", 'results-heading');
 		t = document.createTextNode(heads[1][i]);
 		d.appendChild(t);
 		if(heads[1][i] == "category") {
 			var aCat = document.createElement("A");
 			aCat.setAttribute("href", '#');
-			aCat.appendChild(document.createTextNode('(Filter)'));
+           // aCat.setAttribute("target", '_blank');
+			aCat.appendChild(document.createTextNode(' (Filter)'));
 			aCat.addEventListener('click', getCats);
 			d.appendChild(aCat);
 		}
