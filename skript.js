@@ -395,6 +395,7 @@ function showInfo(input, headers, points) { //points is the array of data
 			if(heads[0][j]) {
 				l = document.createElement("A");
 				l.setAttribute("href", points[i][heads[0][j]].value);
+				l.setAttribute("target", '_blank');
 				l.appendChild(t); d.appendChild(l);
 			}
 			else {
@@ -513,6 +514,18 @@ function filter(e) {
 }
 
 /**
+ * Extends the implicit setAttribute() fction with ability to just append the new value if the attribute already exists
+ **/
+function appendAttribute(elem, attr, newValue) {
+	if(elem.hasAttributes()) {
+		elem.setAttribute(attr, elem.getAttribute(attr) + ' ' + newValue);
+	}
+	else {
+		elem.setAttribute(attr, newValue);
+	}
+}
+
+/**
  *@author David Walsh
  **/
 function xmlToJson(xml) {
@@ -582,21 +595,8 @@ function animateBox(obj) {
 	}
 }
 
-/**
- * Extends the implicit setAttribute() fction with ability to just append the new value if the attribute already exists
- **/
-function appendAttribute(elem, attr, newValue) {
-	if(elem.hasAttributes()) {
-		elem.setAttribute(attr, elem.getAttribute(attr) + ' ' + newValue);
-	}
-	else {
-		elem.setAttribute(attr, newValue);
-	}
-}
-
 function moveToMap(){
                 $('html, body').animate({
                     scrollTop: $("#scroll-to").offset().top
                 }, 1000);
-
 }
