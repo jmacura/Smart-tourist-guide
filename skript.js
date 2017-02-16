@@ -562,3 +562,9 @@ function animateBox(obj) {
 		}
 	}
 }
+
+function moveToMap(){
+                $('html, body').animate({
+                    scrollTop: $("#scroll-to").offset().top
+                }, 1000);
+}

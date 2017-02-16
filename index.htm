@@ -79,7 +79,7 @@
 				Latitude <input  class="form-control" type="text" name="lat" value="49.727"><br>
 				Longitude <input  class="form-control" type="text" name="lon" value="13.352"><br>
 				Radius (km)<input  class="form-control" type="text" name="r" value="1"><br>
-				<input class="btn btn-default" type="submit" value="Search">
+				<input class="btn btn-default" type="submit" value="Search" onclick="moveToMap()">
 			</fieldset>
 		</form>
 	</div>
@@ -91,15 +91,17 @@
 			<fieldset>
 				<legend>Search for POIs around me</legend>
 				Radius <input  class="form-control" type="text" name="r" value="2"><br>
-				<input class="btn btn-default" type="submit" value="Tell my location and search">
+				<input class="btn btn-default" type="submit" value="Tell my location and search" onclick="moveToMap()">
 			</fieldset>
 		</form>
 	</div>
 	</section>
     
     </div>
+ <div id="scroll-to"></div>
 </div>    
     
+
     <div id="mapid"></div>
         <script>
   
