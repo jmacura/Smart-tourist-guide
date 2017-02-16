@@ -107,6 +107,7 @@ function digest(input, points) {
 
 /**
  * currently unused
+ * performs hard regexp matching against SPOI endpoint
  */
 function searchPlaceSPOI(e) {
 	console.log(e);
@@ -352,7 +353,11 @@ function showInfo(input, headers, points) { //points is the array of data
 
 	//print POIs
 	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', 163, 61)';
-    for(var i = 0; i < points.length; i++) {
+	for(var i in points) {
+		if (!points.hasOwnProperty(i)) {
+			//The current property is not a direct property of p
+			continue;
+		}
 		var objName = points[i]['linkThing'].value.split('#')[1];
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
@@ -368,13 +373,23 @@ function showInfo(input, headers, points) { //points is the array of data
 			a.setAttribute("name", objName);
 			d.appendChild(a);
 			//console.log(j, heads[1][j]);
-			/*If the line contains # sign => it is category*/
-			if(points[i][heads[1][j]].value.includes('#')) {
-				r.setAttribute("class", points[i][heads[1][j]].value.slice(32)); // if there is a category for given point => save it to the class attribute of corresponding row
-				var txt = points[i][heads[1][j]].value.slice(32).replace(/_/g, ' '); //Prettyprint categories
+			var txt = '';
+			//console.log(points[i][heads[1][j]]);
+			if(points[i][heads[1][j]].list) {
+			//If there is more then 1 category, then they are in the list attribute
+				for(var k = 0; k < points[i][heads[1][j]].list.length; k++) {
+					if(txt.length > 1) {
+						txt += ', ';
+					}
+					appendAttribute(r, "class", points[i][heads[1][j]].list[k].slice(32));
+					txt += points[i][heads[1][j]].list[k].slice(32).replace(/_/g, ' ');
+				}
+			} else if (points[i][heads[1][j]].value.includes('#')) { //If the line contains # sign => it is a single category
+				appendAttribute(r, "class", points[i][heads[1][j]].value.slice(32)); // if there is a category for given point => save it to the class attribute of corresponding row
+				txt = points[i][heads[1][j]].value.slice(32).replace(/_/g, ' '); //Prettyprint categories
 			}
 			else {
-				var txt = points[i][heads[1][j]].value; // If the object hase no name => print ---
+				txt = points[i][heads[1][j]].value; // If the object has no name => print ---
 			}
 			t = document.createTextNode( (points[i][heads[1][j]]) ? txt : '---');
 			if(heads[0][j]) {
@@ -409,16 +424,16 @@ function preprocess(arr) {
 	console.log(arr);
 	var obj = {};
 	for(var i = 0; i <arr.length; i++) {
-		if(arr[i].linkThing.value) {
-			console.log("duplicity!");
-			//obj[arr[i].]
+		if(obj[arr[i].linkThing.value]) { //if the object already exist..
+			obj[arr[i].linkThing.value].category.list = [obj[arr[i].linkThing.value].category.value, arr[i].category.value]; //..then only create array of categories
+			console.log(obj[arr[i].linkThing.value].category.list);
 		}
 		else {
 			obj[arr[i].linkThing.value] = arr[i];
 		}
 	}
-	console.log(obj);
-	return arr;
+	//console.log(obj);
+	return obj;
 }
 
 //distinct things and their links <-- too complex, too generic, needs refactoring
@@ -478,6 +493,9 @@ function navigateTo(e) {
 	ele.parentNode.parentNode.style.background = '#ddffdd';
 }
 
+/**
+ * Filters categories the user is not interested in and hide them
+ */
 function filter(e) {
 	var cat = e.target.value;
 	console.log(cat);
@@ -561,5 +579,17 @@ function animateBox(obj) {
 				forms[i].parentNode.childNodes[10].style.display = 'none';
 			}
 		}
+	}
+}
+
+/**
+ * Extends the implicit setAttribute() fction with ability to just append the new value if the attribute already exists
+ **/
+function appendAttribute(elem, attr, newValue) {
+	if(elem.hasAttributes()) {
+		elem.setAttribute(attr, elem.getAttribute(attr) + ' ' + newValue);
+	}
+	else {
+		elem.setAttribute(attr, newValue);
 	}
 }
