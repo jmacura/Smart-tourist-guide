@@ -33,8 +33,12 @@ p {margin: 5pt 0 5pt 0;}
 .boxes {text-align: center; color: #ffffff;}
 .credits {padding-top: 20pt; padding-right: 75pt;}
 .desc {display: inline-block; opacity: 0; transition: opacity 0.5s linear;}
-.digest table {border: 0.5pt solid white; border-collapse: collapse; margin: 0 1em;}
-.digest td {border: 0.5pt solid white;}
+
+.digest table {border-bottom: 1px solid #dbdbdb; margin: 0 auto; width: 80%; }
+.digest td {border-bottom: 1px solid #8e8e8e; padding: 5px; width: 40%;}
+.digest td a{color: #e8e8e8;}
+.digest td a:hover{color: white;}
+
 .err {color: red; font-weight: bold; border: 1pt solid red;}
 .left {float: left;}
 .logo {position: absolute; right: 0; bottom: 0; margin: auto 0 auto 0; padding: 30pt 0 0 0;}
@@ -66,3 +70,9 @@ p {margin: 5pt 0 5pt 0;}
 .table-results td{padding: 5px; text-transform: capitalize; border-bottom: 1px solid #d1d1d1; width: 60%;}
 .results-heading{padding-bottom: 10px; text-transform: capitalize; border-bottom: 1px solid #606060; width: 60%;}
 .weather-info{font-size: 10px; margin-bottom: 0px;}
+
+.search-table{color: white; border: 0px !important;border-radius: 25px;}
+.search-table a{color: #009EE0;}
+.search-table a:hover{color: #eff2f5; text-decoration: none;}
+
+#scroll-to{border: 0px; width: 100%; height: 100px;}
