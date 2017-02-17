@@ -357,6 +357,7 @@ function showInfo(input, headers, points) { //points is the array of data
 
 	//print POIs
 	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', 163, 61)';
+    var mypoints = new L.LayerGroup();
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
 			//The current property is not a direct property of p
@@ -368,8 +369,12 @@ function showInfo(input, headers, points) { //points is the array of data
 		//console.log(latlng);
 		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
 		m.name = objName;
-		m.on('click', navigateTo);
-		m.addTo(mymap);
+        m.on('click', navigateTo);
+        
+        
+        m.addTo(mypoints);
+                
+	
 		//console.log(lat, lng);
 		for(var j = 0; j < heads[1].length; j++) {
 			d = document.createElement("TD");
@@ -413,6 +418,8 @@ function showInfo(input, headers, points) { //points is the array of data
 		//r.appendChild(d);
 		ls.appendChild(r);
 	}
+    mymap.addLayer(mypoints);
+    layerControl.addOverlay(mypoints, "My Points "+no);
     
     var f = document.createElement("div");
     f.setAttribute("class", 'to-top');
@@ -612,7 +619,7 @@ function animateBox(obj) {
 	obj.childNodes[1].style.display = 'none';
 	//console.log(obj.childNodes);
 	var forms = document.getElementsByTagName("FORM");
-	for(var i = 0; i < forms.length; i++) {
+	for(var i = 0; i < 3; i++) {
 		if(forms[i].id != obj.childNodes[5].id) {
 			forms[i].style.display = 'none';
 			//console.log(forms[i].parentNode.childNodes[1]);

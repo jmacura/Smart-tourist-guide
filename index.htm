@@ -13,7 +13,7 @@
 	<script src="jquery-ui.min.js"></script>
 	<script src="tokml.js"></script>
 	<script src="skript.js" charset="utf-8"></script>
-
+    
 	<link rel="stylesheet" href="styles.css">
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="jquery-ui.min.css">
@@ -98,16 +98,8 @@
     
 
     <div id="mapid"></div>
-        <script>
-  
-        var mymap = L.map('mapid').setView([49.75, 13.35], 13);
-            
-            L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
-            attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 18
-           }).addTo(mymap);
-        
-        </script>
+    <script src="map.js"></script>
+       
 	<section>
 	<div id="resultsLoader" class="progressbar"></div>
 		<div class="container">
