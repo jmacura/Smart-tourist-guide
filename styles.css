@@ -79,3 +79,6 @@ p {margin: 5pt 0 5pt 0;}
 .header-rows{text-align: center; }
 .form-control{margin-bottom: 5px !important; margin-top: 2px !important;}
 .to-top{ text-align: center; font-size: 20px; margin-top: 20px;}
+.popup-title{ text-align: center; font-weight: bold; margin-bottom: 5px; text-transform: capitalize;}
+.popup-info{ text-align: center; margin-bottom: 5px; text-transform: capitalize;}
+.popup-link{ text-align: center; margin-bottom: 5px; margin-top: 5px;}
