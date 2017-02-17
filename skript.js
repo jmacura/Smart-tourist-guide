@@ -445,26 +445,46 @@ function showInfo(input, headers, points) { //points is the array of data
 
 //Handle duplicates
 function preprocess(arr) {
-	console.log(arr);
+	//console.log(arr);
 	var obj = {};
 	var geojs = {};
 	for(var i = 0; i <arr.length; i++) {
 		if(obj[arr[i].linkThing.value]) { //if the object already exist..
 			obj[arr[i].linkThing.value].category.list = [obj[arr[i].linkThing.value].category.value, arr[i].category.value]; //..then only create array of categories
-			console.log(obj[arr[i].linkThing.value].category.list);
+			geojs[arr[i].linkThing.value].properties.category.list = [geojs[arr[i].linkThing.value].properties.category.value, arr[i].category.value]; //the same for GeoJSON serialization
+			//console.log(obj[arr[i].linkThing.value].category.list);
 		}
 		else {
-		var props = {};
+			var props = {};
+			for(var j in arr[i]) {
+				if(!arr[i].hasOwnProperty(j) || (arr[i][j] && arr[i][j].datatype == 'http://www.openlinksw.com/schemas/virtrdf#Geometry')) { //skip subproperties & geometry type
+					continue;
+				}
+				props[j] = arr[i][j];
+				//console.log(props);
+			}
 			geojs[arr[i].linkThing.value] = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [arr[i].wkt.value.split(" ")[1].slice(0,-1), arr[i].wkt.value.split(" ")[0].slice(6)]}, 'properties' : props};
-			obj[arr[i].linkThing.value] = arr[i];
+			obj[arr[i].linkThing.value] = arr[i]; //the simple way for generic JSON object
 		}
 	}
 	console.log(geojs);
+	if (typeof(Storage) !== "undefined") { // If Browser supports the localStorage/sessionStorage
+		sessionStorage.setItem('result'.concat(no++), JSON.stringify(geojs));
+	} else { //No Web Storage support..
+		printError('Your browser does not support Web Storage API. Export of data will not be available!');
+	}
 	return obj;
 }
 
 function exportHandler(e) {
-	console.log(e.target)
+	console.log(sessionStorage.getItem('result'.concat(no-1)));
+	saveData();
+	//console.log(e.target)
+}
+
+function saveData() {
+	dataBlob = new Blob([sessionStorage.getItem('result'.concat(no-1))], {type: "application/vnd.geo+json;charset=utf-8"})
+	saveAs(dataBlob, 'points.geojson');
 }
 
 //distinct things and their links <-- too complex, too generic, needs refactoring
