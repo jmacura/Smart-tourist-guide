@@ -65,7 +65,7 @@ p {margin: 5pt 0 5pt 0;}
 .sdi4apps-logo{ width: 150px; margin-top: 16px; padding-bottom: 10px;}
 .title-area{max-width: 1000px; margin: 0 auto;  margin-top: 150px; border-radius: 15px !important;}
 
-#background{ width: 100%;  background: url(foto2.jpg) no-repeat; background-size: cover; height: auto;}
+#background{ width: 100%;  background: url(images/foto.jpg) no-repeat; background-size: cover; height: auto;}
 .btn{margin-top: 10px !important;}
 .table-results{width: 60%; margin: 0 auto;}
 .table-results td{padding: 5px; text-transform: capitalize; border-bottom: 1px solid #d1d1d1; width: 60%;}
