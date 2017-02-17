@@ -350,6 +350,8 @@ function showInfo(input, headers, points) { //points is the array of data
 		r.appendChild(d);
 	}
 	ls.appendChild(r);
+    
+
 
 	//print POIs
 	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', 163, 61)';
@@ -409,11 +411,24 @@ function showInfo(input, headers, points) { //points is the array of data
 		//r.appendChild(d);
 		ls.appendChild(r);
 	}
+    
+    var f = document.createElement("div");
+    f.setAttribute("class", 'to-top');
+    var e = document.createElement("a");
+    e.setAttribute("href", '#');
+    e.setAttribute("onclick", 'moveToMap()');
+    f.appendChild(e);
+    var k = document.createElement("span");
+    k.setAttribute("class",'glyphicon glyphicon-chevron-up');
+    e.appendChild(k);
+    // postupně
+    
 	//remove existing information
 	/*while(infoBlock.hasChildNodes()) {
 		infoBlock.removeChild(infoBlock.firstChild);
 	}*/
 	//append new information
+    infoBlock.insertBefore(f, infoBlock.firstChild);
 	infoBlock.insertBefore(ls, infoBlock.firstChild);
 	infoBlock.insertBefore(catFilter, infoBlock.firstChild);
 	infoBlock.insertBefore(charts, infoBlock.firstChild);
