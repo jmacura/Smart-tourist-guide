@@ -6,11 +6,13 @@
 // @author: kellar 2017
 
 // global variables
+var no; //number of searches made during one session
 var destination = null;
 var cats = false;
 
 //defining Event Handlers
 $(document).ready(function(e) {
+	no = 0; //reset the number when the page reloads
 	document.getElementById('search-by-name').addEventListener('submit', searchPlaceGeoNames);
 	document.getElementById('search-by-latlon').addEventListener('submit', searchLocationHeader);
 	document.getElementById('search-by-position').addEventListener('submit', searchAround);
@@ -421,14 +423,20 @@ function showInfo(input, headers, points) { //points is the array of data
     var k = document.createElement("span");
     k.setAttribute("class",'glyphicon glyphicon-chevron-up');
     e.appendChild(k);
-    // postupně
-    
+
+
+	var exporter = document.createElement("BUTTON");
+	exporter.appendChild(document.createTextNode("EXPORT & SAVE POINTS"));
+	exporter.addEventListener('click', exportHandler);
+
 	//remove existing information
 	/*while(infoBlock.hasChildNodes()) {
 		infoBlock.removeChild(infoBlock.firstChild);
 	}*/
 	//append new information
+
     infoBlock.insertBefore(f, infoBlock.firstChild);
+	infoBlock.insertBefore(exporter, infoBlock.firstChild);
 	infoBlock.insertBefore(ls, infoBlock.firstChild);
 	infoBlock.insertBefore(catFilter, infoBlock.firstChild);
 	infoBlock.insertBefore(charts, infoBlock.firstChild);
@@ -439,17 +447,24 @@ function showInfo(input, headers, points) { //points is the array of data
 function preprocess(arr) {
 	console.log(arr);
 	var obj = {};
+	var geojs = {};
 	for(var i = 0; i <arr.length; i++) {
 		if(obj[arr[i].linkThing.value]) { //if the object already exist..
 			obj[arr[i].linkThing.value].category.list = [obj[arr[i].linkThing.value].category.value, arr[i].category.value]; //..then only create array of categories
 			console.log(obj[arr[i].linkThing.value].category.list);
 		}
 		else {
+		var props = {};
+			geojs[arr[i].linkThing.value] = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [arr[i].wkt.value.split(" ")[1].slice(0,-1), arr[i].wkt.value.split(" ")[0].slice(6)]}, 'properties' : props};
 			obj[arr[i].linkThing.value] = arr[i];
 		}
 	}
-	//console.log(obj);
+	console.log(geojs);
 	return obj;
+}
+
+function exportHandler(e) {
+	console.log(e.target)
 }
 
 //distinct things and their links <-- too complex, too generic, needs refactoring
