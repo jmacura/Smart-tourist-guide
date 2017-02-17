@@ -364,13 +364,21 @@ function showInfo(input, headers, points) { //points is the array of data
 			continue;
 		}
 		var objName = points[i]['linkThing'].value.split('#')[1];
+        var objName2 = points[i]['name'].value;
+        objName2 = objName2.replace(/_/g, " ");
+        var objCategory = points[i]['category'].value;
+        objCategory = objCategory.substring(32);
+        objCategory = objCategory.replace(/_/g, " ");
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
 		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
-		m.name = objName;
-        m.on('click', navigateTo);
         
+        m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
+
+        
+		m.name = objName;
+        //m.on('click', navigateTo);
         
         m.addTo(mypoints);
                 
