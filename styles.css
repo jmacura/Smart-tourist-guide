@@ -16,7 +16,7 @@ h1 em {color: #ffffff; font-style: normal; transition: color 1.5s;}
 h2 {text-align: center;}
 .form-group legend{color: white; }
 
-footer {margin: 20pt 0 0 0; position: relative; font-size: small;}
+footer {margin: 20pt; position: relative; font-size: small;}
 footer p {color: rgb(69, 69, 69);}
 h3 {margin: 0.5em 1em;}
 main {position: absolute; width: 100%; margin: 0; padding: 0;}
@@ -54,10 +54,11 @@ p {margin: 5pt 0 5pt 0;}
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}
 
 #charts {margin: 0 auto; height: 330px; width: 100%; text-align: center;}
+#exporter :not(button) {display: none;}
+#exporter span {padding: 5pt 10pt 5pt 5pt;}
 #forecast {height: 100%; width: 100%; text-align: center; margin: 0 auto;}
 #forecast img {width: 100%;}
 #forecast table{margin: 0 auto;}
-
 
 #mapid {margin-top: 0px; margin-bottom: 20px;  height: 400px; width: 100%; z-index: 1;  }
 .subtitle {font-size: 40px; text-shadow: 2px 2px 5px #808080; margin-bottom: 20px; }

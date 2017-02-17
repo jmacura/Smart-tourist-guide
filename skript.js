@@ -1,9 +1,8 @@
-/* JavaScript Document */
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-// @author: jmacura 2016-2017
-// @author: kellar 2017
+// @author jmacura 2016-2017
+// @author jachymkellar 2017
 
 // global variables
 var no; //number of searches made during one session
@@ -430,6 +429,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	mymap.addLayer(mypoints);
 	layerControl.addOverlay(mypoints, "My Points "+no);
 
+	//Footer section with export button
 	var foot = document.createElement("DIV");
 	foot.setAttribute("class", 'to-top');
 	var e = document.createElement("a");
@@ -440,11 +440,38 @@ function showInfo(input, headers, points) { //points is the array of data
 	k.setAttribute("class",'glyphicon glyphicon-chevron-up');
 	e.appendChild(k);
 
-	var exporter = document.createElement("BUTTON");
-	exporter.setAttribute("class", 'btn btn-default');
-	exporter.appendChild(document.createTextNode("EXPORT & SAVE POINTS"));
-	exporter.addEventListener('click', exportHandler);
-	foot.insertBefore(document.createElement("BR"), foot.firstChild);
+	var exporter = document.createElement("FORM");
+	exporter.setAttribute("id", 'exporter');
+	var exBtn = document.createElement("BUTTON");
+	exBtn.setAttribute("class", 'btn btn-default');
+	exBtn.appendChild(document.createTextNode("EXPORT POINTS"));
+	exBtn.addEventListener('click', exportHandler);
+	var gjsOption = document.createElement("INPUT");
+	gjsOption.setAttribute("type", 'radio');
+	gjsOption.setAttribute("name", 'type');
+	gjsOption.setAttribute("value", 'geojson');
+	var kmlOption = document.createElement("INPUT");
+	kmlOption.setAttribute("type", 'radio');
+	kmlOption.setAttribute("name", 'type');
+	kmlOption.setAttribute("value", 'kml');
+	var sendBtn = document.createElement("INPUT");
+	sendBtn.setAttribute("type", 'submit');
+	sendBtn.setAttribute("class", 'btn btn-default');
+	sendBtn.setAttribute("value", 'SAVE');
+	exporter.appendChild(exBtn);
+	exporter.appendChild(document.createElement("BR"));
+	exporter.appendChild(gjsOption);
+	var span = document.createElement("SPAN");
+	span.appendChild(document.createTextNode("GeoJSON"));
+	exporter.appendChild(span);
+	exporter.appendChild(kmlOption);
+	var span = document.createElement("SPAN");
+	span.appendChild(document.createTextNode("KML"));
+	exporter.appendChild(span);
+	exporter.appendChild(document.createElement("BR"));
+	exporter.appendChild(sendBtn);
+	exporter.addEventListener('submit', saveData);
+	//foot.insertBefore(document.createElement("BR"), foot.firstChild);
 	foot.insertBefore(exporter, foot.firstChild);
 
 	//remove existing information
@@ -497,19 +524,36 @@ function preprocess(arr) {
 }
 
 function exportHandler(e) {
-	console.log(sessionStorage.getItem('result'.concat(no-1)));
-	saveData();
-	//console.log(e.target)
+	e.preventDefault();
+	var objs = e.target.parentNode.childNodes;
+	for(var i = 0; i < objs.length; i++) {
+		objs[i].style.display = 'inline-block';
+	}
+	e.target.style.display = 'none';
 }
 
-function saveData() {
-	dataBlob = new Blob([sessionStorage.getItem('result'.concat(no-1))], {type: "application/vnd.geo+json;charset=utf-8"})
-	saveAs(dataBlob, 'points.geojson');
+function saveData(e) {
+	e.preventDefault();
+	var objs = this.childNodes;
+	for(var i = 0; i < objs.length; i++) {
+		objs[i].style.display = 'none';
+	}
+	this.getElementsByTagName("BUTTON")[0].style.display = 'inline-block';
+	var resultset = 'result'.concat(no-1);
+	if(this.type.value == 'geojson') {
+		dataBlob = new Blob([sessionStorage.getItem(resultset)], {type: "application/vnd.geo+json;charset=utf-8"})
+		saveAs(dataBlob, 'points_' + resultset + '.geojson');
+	} else if(this.type.value == 'kml') {
+		var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)));
+		dataBlob = new Blob([kml], {type: "application/vnd.google-earth.kml+xml;charset=utf-8"})
+		saveAs(dataBlob, 'points_' + resultset + '.kml');
+	} else {
+		printError('Error exporting the data');
+	}
 }
 
 //distinct things and their links <-- too complex, too generic, needs refactoring
 function thingsAndLinks(arr) {
-	//console.log(arr);
 	if(! (arr instanceof Array)) {console.log("no way!"); return;}
 	var newA = [[0],[0]];
 	var j = 0;
@@ -519,7 +563,6 @@ function thingsAndLinks(arr) {
 			newA[0][j] = arr[i];
 		}
 		else if(arr[i].substring(0,3) == 'wkt') {
-			//console.log("wkt");
 		}
 		else {
 			newA[1][j++] = arr[i];
