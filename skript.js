@@ -418,23 +418,26 @@ function showInfo(input, headers, points) { //points is the array of data
 		//r.appendChild(d);
 		ls.appendChild(r);
 	}
-    mymap.addLayer(mypoints);
-    layerControl.addOverlay(mypoints, "My Points "+no);
-    
-    var f = document.createElement("div");
-    f.setAttribute("class", 'to-top');
-    var e = document.createElement("a");
-    e.setAttribute("href", '#');
-    e.setAttribute("onclick", 'moveToMap()');
-    f.appendChild(e);
-    var k = document.createElement("span");
-    k.setAttribute("class",'glyphicon glyphicon-chevron-up');
-    e.appendChild(k);
 
+	mymap.addLayer(mypoints);
+	layerControl.addOverlay(mypoints, "My Points "+no);
+
+	var foot = document.createElement("DIV");
+	foot.setAttribute("class", 'to-top');
+	var e = document.createElement("a");
+	e.setAttribute("href", '#');
+	e.setAttribute("onclick", 'moveToMap()');
+	foot.appendChild(e);
+	var k = document.createElement("span");
+	k.setAttribute("class",'glyphicon glyphicon-chevron-up');
+	e.appendChild(k);
 
 	var exporter = document.createElement("BUTTON");
+	exporter.setAttribute("class", 'btn btn-default');
 	exporter.appendChild(document.createTextNode("EXPORT & SAVE POINTS"));
 	exporter.addEventListener('click', exportHandler);
+	foot.insertBefore(document.createElement("BR"), foot.firstChild);
+	foot.insertBefore(exporter, foot.firstChild);
 
 	//remove existing information
 	/*while(infoBlock.hasChildNodes()) {
@@ -442,8 +445,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	}*/
 	//append new information
 
-    infoBlock.insertBefore(f, infoBlock.firstChild);
-	infoBlock.insertBefore(exporter, infoBlock.firstChild);
+	infoBlock.insertBefore(foot, infoBlock.firstChild);
 	infoBlock.insertBefore(ls, infoBlock.firstChild);
 	infoBlock.insertBefore(catFilter, infoBlock.firstChild);
 	infoBlock.insertBefore(charts, infoBlock.firstChild);
@@ -452,32 +454,35 @@ function showInfo(input, headers, points) { //points is the array of data
 
 //Handle duplicates
 function preprocess(arr) {
-	//console.log(arr);
 	var obj = {};
-	var geojs = {};
+	var geojs = [];
+	var k = 0;
 	for(var i = 0; i <arr.length; i++) {
 		if(obj[arr[i].linkThing.value]) { //if the object already exist..
 			obj[arr[i].linkThing.value].category.list = [obj[arr[i].linkThing.value].category.value, arr[i].category.value]; //..then only create array of categories
-			geojs[arr[i].linkThing.value].properties.category.list = [geojs[arr[i].linkThing.value].properties.category.value, arr[i].category.value]; //the same for GeoJSON serialization
 			//console.log(obj[arr[i].linkThing.value].category.list);
 		}
 		else {
-			var props = {};
-			for(var j in arr[i]) {
-				if(!arr[i].hasOwnProperty(j) || (arr[i][j] && arr[i][j].datatype == 'http://www.openlinksw.com/schemas/virtrdf#Geometry')) { //skip subproperties & geometry type
-					continue;
-				}
-				props[j] = arr[i][j];
-				//console.log(props);
-			}
-			geojs[arr[i].linkThing.value] = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [arr[i].wkt.value.split(" ")[1].slice(0,-1), arr[i].wkt.value.split(" ")[0].slice(6)]}, 'properties' : props};
 			obj[arr[i].linkThing.value] = arr[i]; //the simple way for generic JSON object
 		}
 	}
-	console.log(geojs);
+	var k = 0;
+	for(var i in obj) {
+	var props = {};
+		for(var j in obj[i]) {
+			if(!obj[i].hasOwnProperty(j) || (obj[i][j] && obj[i][j].datatype == 'http://www.openlinksw.com/schemas/virtrdf#Geometry')) { //skip subproperties & geometry type
+				continue;
+			}
+			props[j] = obj[i][j];
+			//console.log(props);
+		}
+		geojs[k++] = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [Number(obj[i].wkt.value.split(" ")[0].slice(6)), Number(obj[i].wkt.value.split(" ")[1].slice(0,-1))]}, 'properties' : props};
+	}
+	//console.log(geojs);
+	geojs = {"type": "FeatureCollection", "features": geojs};
 	if (typeof(Storage) !== "undefined") { // If Browser supports the localStorage/sessionStorage
 		sessionStorage.setItem('result'.concat(no++), JSON.stringify(geojs));
-	} else { //No Web Storage support..
+	} else { //No Web Storage support
 		printError('Your browser does not support Web Storage API. Export of data will not be available!');
 	}
 	return obj;
