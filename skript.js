@@ -116,7 +116,7 @@ function searchPlaceSPOI(e) {
 	runProgressbar('resultsLoader');
 	searchLocation([place.lat, place.lng, 3]);
 	//searchLocation(place.,4);
-	/*var url = 'http://data.plan4all.eu/sparql';
+	var url = 'http://data.plan4all.eu/sparql';
 	var query = 'SELECT DISTINCT ?linkThing ?name ?wkt \n' +
 		'WHERE {\n' +
 		' ?linkThing rdfs:label ?name.\n' +
@@ -135,7 +135,7 @@ function searchPlaceSPOI(e) {
 			killProgressbar("resultsLoader");
 		}
 	});
-	this.reset();*/
+	this.reset();
 }
 
 function searchLocationHeader(e) {
@@ -173,7 +173,7 @@ function searchLocation(input) {
 		success: function(data) {
 			//console.log(data);
 			var POIs = preprocess(data.results.bindings);
-            mymap.setView([input[0], input[1]], 13);
+			mymap.setView([input[0], input[1]], 13);
 			showInfo(input, data.head.vars, POIs);
 			killProgressbar("resultsLoader");
 		}
@@ -181,7 +181,7 @@ function searchLocation(input) {
 	//this.reset();
 }
 
-// **** Get  the list of Categories (Classes) from SPOI ****
+// **** Get the list of Categories (Classes) from SPOI ****
 function getCats() {
 	if(cats) {return;};
 	cats = true;
@@ -243,7 +243,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	charts.setAttribute("id", 'charts');
 
 	//create map
-    /*
+	/*
 	var mappa = document.createElement("DIV");
 	mappa.setAttribute("id", 'map');
 	charts.appendChild(mappa);
@@ -279,9 +279,8 @@ function showInfo(input, headers, points) { //points is the array of data
 			var weather = parseWeather(obj); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
 			//console.log(weather);
 			var h = document.createElement("H3");
-            h.setAttribute("style", 'text-align: center;');
 			h.appendChild(document.createTextNode('Weather forecast in the location for the upcoming 48 hours'));
-           	forecast.appendChild(h);
+			forecast.appendChild(h);
 			r = document.createElement("TR");
 			for(var i = 0; i < weather.length; i++) {
 				d = document.createElement("TD");
@@ -314,11 +313,8 @@ function showInfo(input, headers, points) { //points is the array of data
 			forecast.appendChild(tab);
 			p = document.createElement("P");
 			p.setAttribute("class", 'weather-info');
-            p.setAttribute("style", 'text-align: center;');
 			p.appendChild(document.createTextNode('Weather forecast from Yr, delivered by the Norwegian Meteorological Institute and NRK'));
 			forecast.appendChild(p);
-            
-
 		}
 	});
 
@@ -332,18 +328,17 @@ function showInfo(input, headers, points) { //points is the array of data
 	//catFilter.addEventListener('mouseover', getCats);
 
 	ls = document.createElement("TABLE");
-    ls.setAttribute("class", 'table-results');
+	ls.setAttribute("class", 'table-results');
 	//set headers
 	r = document.createElement("TR");
 	for(var i = 0; i < heads[1].length; i++) {
 		d = document.createElement("TH");
-        d.setAttribute("class", 'results-heading');
+		d.setAttribute("class", 'results-heading');
 		t = document.createTextNode(heads[1][i]);
 		d.appendChild(t);
 		if(heads[1][i] == "category") {
 			var aCat = document.createElement("A");
 			aCat.setAttribute("href", '#');
-           // aCat.setAttribute("target", '_blank');
 			aCat.appendChild(document.createTextNode(' (Filter)'));
 			aCat.addEventListener('click', getCats);
 			d.appendChild(aCat);
@@ -351,37 +346,28 @@ function showInfo(input, headers, points) { //points is the array of data
 		r.appendChild(d);
 	}
 	ls.appendChild(r);
-    
 
 
 	//print POIs
 	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', 163, 61)';
-    var mypoints = new L.LayerGroup();
+	var mypoints = new L.LayerGroup();
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
-			//The current property is not a direct property of p
-			continue;
+			continue; //the current property is not a direct property of p
 		}
 		var objName = points[i]['linkThing'].value.split('#')[1];
-        var objName2 = points[i]['name'].value;
-        objName2 = objName2.replace(/_/g, " ");
-        var objCategory = points[i]['category'].value;
-        objCategory = objCategory.substring(32);
-        objCategory = objCategory.replace(/_/g, " ");
+		var objName2 = points[i]['name'].value;
+		objName2 = objName2.replace(/_/g, " ");
+		var objCategory = points[i]['category'].value.substring(32).replace(/_/g, " ");
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
 		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
-        
-        m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
-
-        
+		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
 		m.name = objName;
-        //m.on('click', navigateTo);
-        
-        m.addTo(mypoints);
-                
-	
+		//m.on('click', navigateTo);
+		m.addTo(mypoints);
+
 		//console.log(lat, lng);
 		for(var j = 0; j < heads[1].length; j++) {
 			d = document.createElement("TD");
@@ -709,7 +695,7 @@ function animateBox(obj) {
 }
 
 function moveToMap(){
-                $('html, body').animate({
-                    scrollTop: $("#scroll-to").offset().top
-                }, 1000);
+	$('html, body').animate({
+		scrollTop: $("#scroll-to").offset().top
+	}, 1000);
 }

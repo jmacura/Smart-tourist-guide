@@ -70,7 +70,7 @@ p {margin: 5pt 0 5pt 0;}
 .table-results{width: 60%; margin: 0 auto;}
 .table-results td{padding: 5px; text-transform: capitalize; border-bottom: 1px solid #d1d1d1; width: 60%;}
 .results-heading{padding-bottom: 10px; text-transform: capitalize; border-bottom: 1px solid #606060; width: 60%;}
-.weather-info{font-size: 10px; margin-bottom: 0px;}
+.weather-info{font-size: 10px; margin-bottom: 0px; text-align: center;}
 
 .search-table{color: white; border: 0px !important;border-radius: 25px;}
 .search-table a{color: #009EE0;}
