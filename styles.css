@@ -40,6 +40,8 @@ p {margin: 5pt 0 5pt 0;}
 .digest td a:hover{color: white;}
 
 .err {color: red; font-weight: bold; border: 1pt solid red;}
+.exporter :not(button) {display: none;}
+.exporter span {padding: 5pt 10pt 5pt 5pt;}
 .left {float: left;}
 .logo {position: absolute; right: 0; bottom: 0; margin: auto 0 auto 0; padding: 30pt 0 0 0;}
 .logo img {width: 75pt;}
@@ -54,8 +56,6 @@ p {margin: 5pt 0 5pt 0;}
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}
 
 #charts {margin: 0 auto; height: 330px; width: 100%; text-align: center;}
-#exporter :not(button) {display: none;}
-#exporter span {padding: 5pt 10pt 5pt 5pt;}
 #forecast {height: 100%; width: 100%; text-align: center; margin: 0 auto;}
 #forecast img {width: 100%;}
 #forecast table{margin: 0 auto;}

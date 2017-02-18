@@ -88,7 +88,7 @@ function digest(input, points) {
 		r = document.createElement('TR');
 		d = document.createElement('TD');
 		a = document.createElement('A');
-		a.data = points[i];
+		a.data = points[i]; //used in searchPlaceSPOI()
 		a.addEventListener('click', searchPlaceSPOI);
 		a.setAttribute("href", '#');
 		a.appendChild(document.createTextNode(points[i].name));
@@ -107,16 +107,18 @@ function digest(input, points) {
 }
 
 /**
- * currently unused
- * performs hard regexp matching against SPOI endpoint
+ * handles GeoNames result to search in SPOI
  */
 function searchPlaceSPOI(e) {
 	console.log(e);
 	place = e.target.data;
 	runProgressbar('resultsLoader');
 	searchLocation([place.lat, place.lng, 3]);
-	//searchLocation(place.,4);
-	var url = 'http://data.plan4all.eu/sparql';
+/**
+	* currently unused part
+	* performs hard regexp matching against SPOI endpoint
+	*/
+/*var url = 'http://data.plan4all.eu/sparql';
 	var query = 'SELECT DISTINCT ?linkThing ?name ?wkt \n' +
 		'WHERE {\n' +
 		' ?linkThing rdfs:label ?name.\n' +
@@ -134,8 +136,7 @@ function searchPlaceSPOI(e) {
 			showInfo([place], data.head.vars, POIs);
 			killProgressbar("resultsLoader");
 		}
-	});
-	this.reset();
+	});*/
 }
 
 function searchLocationHeader(e) {
@@ -225,6 +226,9 @@ function getCats() {
 // **** Background support for displaying info ****
 function showInfo(input, headers, points) { //points is the array of data
 	var heads = thingsAndLinks(headers);
+	console.log(headers);
+	console.log(heads);
+	console.log(points);
 	var infoBlock = document.getElementById("info-block");
 	var nfo, ls, r, d, l, t, p;
 
@@ -427,7 +431,8 @@ function showInfo(input, headers, points) { //points is the array of data
 	e.appendChild(k);
 
 	var exporter = document.createElement("FORM");
-	exporter.setAttribute("id", 'exporter');
+	exporter.setAttribute("class", 'exporter');
+	exporter.setAttribute("id", 'points_result_'.concat(no));
 	var exBtn = document.createElement("BUTTON");
 	exBtn.setAttribute("class", 'btn btn-default');
 	exBtn.appendChild(document.createTextNode("EXPORT POINTS"));
@@ -502,7 +507,7 @@ function preprocess(arr) {
 	//console.log(geojs);
 	geojs = {"type": "FeatureCollection", "features": geojs};
 	if (typeof(Storage) !== "undefined") { // If Browser supports the localStorage/sessionStorage
-		sessionStorage.setItem('result'.concat(no++), JSON.stringify(geojs));
+		sessionStorage.setItem('result'.concat(++no), JSON.stringify(geojs));
 	} else { //No Web Storage support
 		printError('Your browser does not support Web Storage API. Export of data will not be available!');
 	}
@@ -525,14 +530,14 @@ function saveData(e) {
 		objs[i].style.display = 'none';
 	}
 	this.getElementsByTagName("BUTTON")[0].style.display = 'inline-block';
-	var resultset = 'result'.concat(no-1);
+	var resultset = this.id;
 	if(this.type.value == 'geojson') {
 		dataBlob = new Blob([sessionStorage.getItem(resultset)], {type: "application/vnd.geo+json;charset=utf-8"})
-		saveAs(dataBlob, 'points_' + resultset + '.geojson');
+		saveAs(dataBlob, resultset + '.geojson');
 	} else if(this.type.value == 'kml') {
 		var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)));
 		dataBlob = new Blob([kml], {type: "application/vnd.google-earth.kml+xml;charset=utf-8"})
-		saveAs(dataBlob, 'points_' + resultset + '.kml');
+		saveAs(dataBlob, resultset + '.kml');
 	} else {
 		printError('Error exporting the data');
 	}
