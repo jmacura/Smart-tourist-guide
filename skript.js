@@ -358,6 +358,7 @@ function showInfo(input, headers, points) { //points is the array of data
     var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
     var color2 = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
 	var mypoints = new L.LayerGroup();
+    var markersCluster = L.markerClusterGroup();
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
 			continue; //the current property is not a direct property of p
@@ -378,7 +379,8 @@ function showInfo(input, headers, points) { //points is the array of data
 		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
 		m.name = objName;
 		//m.on('click', navigateTo);
-		m.addTo(mypoints);
+		//m.addTo(mypoints);
+        markersCluster.addLayer(m);
 
 		//console.log(lat, lng);
 		for(var j = 0; j < heads[1].length; j++) {
@@ -424,10 +426,12 @@ function showInfo(input, headers, points) { //points is the array of data
 		ls.appendChild(r);
 	}
 
-	mymap.addLayer(mypoints);
-	layerControl.addOverlay(mypoints, "My Points "+no);
+	//mymap.addLayer(mypoints);
+	//layerControl.addOverlay(mypoints, "My Points "+no);
+    mymap.addLayer(markersCluster);
+	layerControl.addOverlay(markersCluster, "My Points "+no);
 
-	//Footer section with export button
+  	//Footer section with export button
 	var foot = document.createElement("DIV");
 	foot.setAttribute("class", 'to-top');
 	var e = document.createElement("a");
