@@ -353,7 +353,9 @@ function showInfo(input, headers, points) { //points is the array of data
 
 
 	//print POIs
-	var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+	//var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+    var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
+    var color2 = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
 	var mypoints = new L.LayerGroup();
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
@@ -366,7 +368,12 @@ function showInfo(input, headers, points) { //points is the array of data
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
-		var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color});
+        if(no < 12){
+            var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
+        }
+        else{
+            var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color2});
+        }
 		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
 		m.name = objName;
 		//m.on('click', navigateTo);
