@@ -50,7 +50,7 @@ p {margin: 5pt 0 5pt 0;}
 .tmin {color: blue;}
 .tmax {color: red;}
 
-#catFilter {float: right; border: 2pt solid red; width: 20%; display:none;}
+#catFilter {float: right; border: 0.5em solid rgb(0, 142, 214); width: 20%; display: none;}
 /*#catFilter:hover {visibility: visible;}*/
 
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}

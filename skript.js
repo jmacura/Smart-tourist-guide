@@ -47,8 +47,8 @@ function searchAround(e) {
 			case error.UNKNOWN_ERROR:
 				printError("An unknown error occurred."); break;
 		}
-		}, {enableHighAccuracy: false, timeout: 1000, maximumAge: 0}
-	); //10 000 ms timeout
+		}, {enableHighAccuracy: false, timeout: 5000, maximumAge: 0}
+	); //5 000 ms timeout
 }
 
 function searchPlaceGeoNames(e) {
@@ -88,9 +88,9 @@ function digest(input, points) {
 		r = document.createElement('TR');
 		d = document.createElement('TD');
 		a = document.createElement('A');
-        a.setAttribute("onclick", 'moveToMap()');
 		a.data = points[i]; //used in searchPlaceSPOI()
-		a.addEventListener('click', searchPlaceSPOI);
+		$(a).on('click', searchPlaceSPOI);
+		$(a).on('click', moveToMap);
 		a.setAttribute("href", '#');
 		a.appendChild(document.createTextNode(points[i].name));
 		d.appendChild(a);
@@ -183,13 +183,16 @@ function searchLocation(input) {
 	//this.reset();
 }
 
-// **** Get the list of Categories (Classes) from SPOI ****
+// **** Get the list of Categories (Classes) from static file ****
 function getCats() {
 	if(cats) {return;};
 	cats = true;
 	document.getElementById("catFilter").style.display = 'block';
 	runProgressbar('catProgress');
-	var url = 'http://data.plan4all.eu/sparql';
+	/**
+	 * This part was used to get the data from SPARQL endpoint on-the-fly
+	 */
+	/*var url = 'http://data.plan4all.eu/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
 	"SELECT DISTINCT ?Concept WHERE {?obj poi:class ?Concept}";
 	console.log(query);
@@ -199,37 +202,59 @@ function getCats() {
 		url: queryUrl,
 		error: function(jqXHR, status, err) {
 			console.log(status + err);
-		},
-		success: function(data) {
-			var catz = data.results.bindings;
 			killProgressbar('catProgress');
+		},
+		success: function(data) {//*/
+	$.getJSON('classes.json', function(data) {
+			//console.log(data);
+			var catz = data.results;
 			var catFilter = document.getElementById("catFilter");
+			var h = document.createElement("H3");
+			h.appendChild(document.createTextNode("Select/deselect categories to display"));
+			catFilter.appendChild(h);
 			var ls = document.createElement("UL");
+			var deselector = document.createElement("INPUT");
+			deselector.setAttribute("type", 'checkbox');
+			deselector.setAttribute("checked", '');
+			$(deselector).on('change', function() {
+				//console.log(this);
+				$(this.parentNode.getElementsByTagName("INPUT")).prop('checked', $(this).prop('checked'));
+				$(this.parentNode.getElementsByClassName('classItem')).trigger('change');
+			});
+			var em = document.createElement("STRONG");
+			em.appendChild(document.createTextNode("Un/check all"));
+			ls.appendChild(deselector);
+			ls.appendChild(em);
+			ls.appendChild(document.createElement("BR"));
 			for(var i = 0; i < catz.length; i++) {
-				var cat = catz[i].Concept.value.slice(32);
+				var cat = catz[i].Class.value.slice(32);
 				//console.log(cat);
 				var li = document.createElement("INPUT");
 				li.setAttribute("type", 'checkbox');
 				li.setAttribute("value", cat);
-				li.setAttributeNode(document.createAttribute("checked"));
-				li.addEventListener('change', filter);
+				li.setAttribute("checked", '');
+				li.setAttribute("class", 'classItem');
+				$(li).on('change', filter);
 				ls.appendChild(li);
-				ls.appendChild(document.createTextNode(cat));
+				ls.appendChild(document.createTextNode(cat.replace(/_/g, " ")));
 				ls.appendChild(document.createElement("BR"));
 			}
 			catFilter.appendChild(ls);
+			killProgressbar('catProgress');
 			//showInfo(input, data.head.vars, POIs);
 			//killProgressbar("resultsLoader");
-		}
+	}).fail(function(jqXHR, status, err) {
+		printError("Failed to get category list: " + status + " " + err);
+		killProgressbar('catProgress');
 	});
 }
 
 // **** Background support for displaying info ****
 function showInfo(input, headers, points) { //points is the array of data
 	var heads = thingsAndLinks(headers);
-	console.log(headers);
-	console.log(heads);
-	console.log(points);
+	//console.log(headers);
+	//console.log(heads);
+	//console.log(points);
 	var infoBlock = document.getElementById("info-block");
 	var nfo, ls, r, d, l, t, p;
 
@@ -343,7 +368,7 @@ function showInfo(input, headers, points) { //points is the array of data
 		d.appendChild(t);
 		if(heads[1][i] == "category") {
 			var aCat = document.createElement("A");
-			aCat.setAttribute("href", '#');
+			aCat.setAttribute("href", '##');
 			aCat.appendChild(document.createTextNode(' (Filter)'));
 			aCat.addEventListener('click', getCats);
 			d.appendChild(aCat);
@@ -354,9 +379,8 @@ function showInfo(input, headers, points) { //points is the array of data
 
 
 	//print POIs
-	//var color = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
-    var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
-    var color2 = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+	var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
+	var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
 	var mypoints = new L.LayerGroup();
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
@@ -369,13 +393,13 @@ function showInfo(input, headers, points) { //points is the array of data
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
-        if(no < 12){
-            var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
-        }
-        else{
-            var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: color2});
-        }
-		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Navigate to<a/></div>");
+		if(no < 12){
+			var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
+		}
+		else{
+			var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: colorFallback});
+		}
+		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Table info<a/></div>");
 		m.name = objName;
 		//m.on('click', navigateTo);
 		m.addTo(mypoints);
@@ -612,7 +636,6 @@ function navigateTo(e) {
  */
 function filter(e) {
 	var cat = e.target.value;
-	console.log(cat);
 	var lines = document.getElementsByClassName(cat);
 	if(lines[0] && lines[0].style.display != 'none') {
 		for(var i = 0; i < lines.length; i++) {
