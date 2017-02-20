@@ -88,6 +88,7 @@ function digest(input, points) {
 		r = document.createElement('TR');
 		d = document.createElement('TD');
 		a = document.createElement('A');
+        a.setAttribute("onclick", 'moveToMap()');
 		a.data = points[i]; //used in searchPlaceSPOI()
 		a.addEventListener('click', searchPlaceSPOI);
 		a.setAttribute("href", '#');
