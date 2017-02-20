@@ -83,3 +83,4 @@ p {margin: 5pt 0 5pt 0;}
 .popup-title{ text-align: center; font-weight: bold; margin-bottom: 5px; text-transform: capitalize;}
 .popup-info{ text-align: center; margin-bottom: 5px; text-transform: capitalize;}
 .popup-link{ text-align: center; margin-bottom: 5px; margin-top: 5px;}
+#info-block h2{text-shadow: 1px 2px 3px #808080;}
