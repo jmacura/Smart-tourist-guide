@@ -238,11 +238,12 @@ function showInfo(input, headers, points) { //points is the array of data
 	var info = 'Results for ';
 	for(var i = 0; i < input.length; i++) {
 		if(i > 0) {info += " "};
-		info += input[i];
+		info += Math.round(input[i]*10000)/10000;
 	}
-	t = document.createTextNode(info + ':');
+	t = document.createTextNode(info + ' km');
 	nfo.appendChild(t);
 
+    //Math.round((latlng[1].slice(0,-1))*1000)/1000
 	
 	var charts = document.createElement("DIV");
 	charts.setAttribute("id", 'charts');
