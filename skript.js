@@ -380,10 +380,12 @@ function showInfo(input, headers, points) { //points is the array of data
 
 
 	//print POIs
-	var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
-	var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
-	var mypoints = new L.LayerGroup();
-    var markersCluster = L.markerClusterGroup();
+	//var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
+	//var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+	//var mypoints = new L.LayerGroup();
+    //var markersCluster = L.markerClusterGroup();
+    var markersList = [];  // pole objektů
+    
 	for(var i in points) {
 		if (!points.hasOwnProperty(i)) {
 			continue; //the current property is not a direct property of p
@@ -395,17 +397,30 @@ function showInfo(input, headers, points) { //points is the array of data
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
+        
+        var markerObject = {lat: "",long: "", title: "", name: "",category: ""}; // objekt reprezentující marker
+        markerObject.lat = latlng[1].slice(0,-1);
+        markerObject.long = latlng[0].slice(6);
+        markerObject.title = objName2;
+        markerObject.name = objName;
+        markerObject.category = objCategory;
+        markersList.push(markerObject); // vložení objektu do pole
+        
+        /*
 		if(no < 12){
 			var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
+           // markersList.push(m);
 		}
 		else{
 			var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: colorFallback});
+           // markersList.push(m);
 		}
 		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Table info<a/></div>");
 		m.name = objName;
 		//m.on('click', navigateTo);
 		//m.addTo(mypoints);
         markersCluster.addLayer(m);
+        */
 
 		//console.log(lat, lng);
 		for(var j = 0; j < heads[1].length; j++) {
@@ -442,6 +457,7 @@ function showInfo(input, headers, points) { //points is the array of data
 			else {
 				d.appendChild(t);
 			}
+            
 			r.appendChild(d);
 		}
 		//d = document.createElement("TD");
@@ -449,12 +465,16 @@ function showInfo(input, headers, points) { //points is the array of data
 		//d.appendChild(t);
 		//r.appendChild(d);
 		ls.appendChild(r);
-	}
+	} // end of for in points
 
-	//mymap.addLayer(mypoints);
-	//layerControl.addOverlay(mypoints, "My Points "+no);
-    mymap.addLayer(markersCluster);
-	layerControl.addOverlay(markersCluster, "My Points "+no);
+
+   // mymap.addLayer(markersCluster);
+	//layerControl.addOverlay(markersCluster, "My Points "+no);
+    //console.log(markersList);
+    
+    // Vykreslení markerů v mapě
+    drawMarkers(markersList);
+ 
 
   	//Footer section with export button
 	var foot = document.createElement("DIV");
@@ -740,4 +760,24 @@ function moveToMap(){
 	$('html, body').animate({
 		scrollTop: $("#scroll-to").offset().top
 	}, 1000);
+}
+
+function drawMarkers(list){
+    var markersCluster = L.markerClusterGroup();
+    var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
+    var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+    for(var l = 0; l < list.length; l++){
+        
+        if(no < 12){
+			var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
+		}
+		else{
+			var m = L.circleMarker([list[l]['lat'], list[l]['long']], {radius: 7, color: colorFallback});
+		}
+        
+        s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['category']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
+        markersCluster.addLayer(s);
+    }
+    mymap.addLayer(markersCluster);
+	layerControl.addOverlay(markersCluster, "My Points "+no);
 }
