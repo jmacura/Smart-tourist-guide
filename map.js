@@ -27,7 +27,8 @@
             var mymap = new L.Map('mapid', {
                 layers: [Hydda],
                 center: [49.75, 13.35],
-                zoom: 13
+                zoom: 13,
+                fullscreenControl: true
               });
             
             var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(mymap);
