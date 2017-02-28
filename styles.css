@@ -60,7 +60,7 @@ p {margin: 5pt 0 5pt 0;}
 #forecast img {width: 100%;}
 #forecast table{margin: 0 auto;}
 
-#mapid {margin-top: 0px; margin-bottom: 20px;  height: 400px; width: 100%; z-index: 1;  }
+#mapid {margin-top: 0px; margin-bottom: 20px;  height: 470px; width: 100%; z-index: 1;  }
 .subtitle {font-size: 40px; text-shadow: 2px 2px 5px #808080; margin-bottom: 20px; }
 .sdi4apps-logo{ width: 150px; margin-top: 16px; padding-bottom: 10px;}
 .title-area{max-width: 1000px; margin: 0 auto;  margin-top: 150px; border-radius: 15px !important;}
@@ -84,3 +84,4 @@ p {margin: 5pt 0 5pt 0;}
 .popup-info{ text-align: center; margin-bottom: 5px; text-transform: capitalize;}
 .popup-link{ text-align: center; margin-bottom: 5px; margin-top: 5px;}
 #info-block h2{text-shadow: 1px 2px 3px #808080;}
+.italic{font-style: italic;}
