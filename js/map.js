@@ -16,7 +16,7 @@
             
             var baseMaps = {
                   "Hydda": Hydda,
-                  "OpenStreetMap": OpenStreetMap,
+                  "OpenStreetMap Carto": OpenStreetMap,
                   "OpenCycloMap": OpenCycleMap
             };
                       
