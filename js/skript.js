@@ -219,15 +219,19 @@ function getCats() {
 			$(deselector).on('change', function() {
 				//console.log(this);
 				$(this.parentNode.getElementsByTagName("INPUT")).prop('checked', $(this).prop('checked'));
-				$(this.parentNode.getElementsByClassName('classItem')).trigger('change');
+				filterAll($(this).prop('checked')); //if the input is checked -> show all/ if unchecked -> hide all
 			});
 			var em = document.createElement("STRONG");
 			em.appendChild(document.createTextNode("Un/check all"));
 			ls.appendChild(deselector);
 			ls.appendChild(em);
 			ls.appendChild(document.createElement("BR"));
+			var cat = '';
 			for(var i = 0; i < catz.length; i++) {
-				var cat = catz[i].Class.value.slice(32);
+				if(cat == catz[i].mainClass.value.slice(32)) {
+					continue;
+				}
+				cat = catz[i].mainClass.value.slice(32);
 				//console.log(cat);
 				var li = document.createElement("INPUT");
 				li.setAttribute("type", 'checkbox');
@@ -278,7 +282,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	var mappa = document.createElement("DIV");
 	mappa.setAttribute("id", 'map');
 	charts.appendChild(mappa);
-	if (input[1]) {
+	if (input[1]) {))
 		var map = L.map(mappa).setView([input[0], input[1]], 11);
 	}
 	else {
@@ -696,10 +700,30 @@ function filter(e) {
 }
 
 /**
+ * Hide or display all categories at once
+ */
+function filterAll(show) {
+	var tables = document.getElementsByClassName("table-results");
+	for(var i = 0; i < tables.length; i++) {
+		var lines = tables[i].getElementsByTagName("TR");
+		if(show) {
+			for(var j = 1; j < lines.length; j++) { //skip heading
+				lines[j].style.display = 'table-row';
+			}
+		}
+		else {
+			for(var j = 1; j < lines.length; j++) { //skip heading
+				lines[j].style.display = 'none';
+			}
+		}
+	}
+}
+
+/**
  * Extends the implicit setAttribute() fction with ability to just append the new value if the attribute already exists
  **/
 function appendAttribute(elem, attr, newValue) {
-	if(elem.hasAttributes()) {
+	if(elem.hasAttribute(attr)) {
 		elem.setAttribute(attr, elem.getAttribute(attr) + ' ' + newValue);
 	}
 	else {

@@ -50,7 +50,7 @@ p {margin: 5pt 0 5pt 0;}
 .tmin {color: blue;}
 .tmax {color: red;}
 
-#catFilter {float: right; border: 0.5em solid rgb(0, 142, 214); width: 20%; display: none;}
+#catFilter {float: right; border: 0.3em solid rgb(0, 142, 214); width: 20%; display: none;}
 /*#catFilter:hover {visibility: visible;}*/
 
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}
@@ -85,3 +85,5 @@ p {margin: 5pt 0 5pt 0;}
 .popup-link{ text-align: center; margin-bottom: 5px; margin-top: 5px;}
 #info-block h2{text-shadow: 1px 2px 3px #808080;}
 .italic{font-style: italic;}
+
+th a {float: right;}
