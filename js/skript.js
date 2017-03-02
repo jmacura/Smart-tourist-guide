@@ -282,7 +282,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	var mappa = document.createElement("DIV");
 	mappa.setAttribute("id", 'map');
 	charts.appendChild(mappa);
-	if (input[1]) {))
+	if (input[1]) {
 		var map = L.map(mappa).setView([input[0], input[1]], 11);
 	}
 	else {

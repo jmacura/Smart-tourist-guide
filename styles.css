@@ -21,6 +21,7 @@ footer p {color: rgb(69, 69, 69);}
 h3 {margin: 0.5em 1em;}
 main {position: absolute; width: 100%; margin: 0; padding: 0;}
 p {margin: 5pt 0 5pt 0;}
+th a {float: right;}
 
 .box {display: inline-block; vertical-align: bottom; margin: 10px; width: 100%; padding-top: 30px; padding-bottom: 20px; max-width: 300px; background: rgb(0, 142, 214); transition: background 0.5s;   border-radius: 15px; padding-left: 30px; padding-right: 30px; vertical-align: top;}
 .box:before {content: ''; padding-bottom: 140%; float:left;}
@@ -85,5 +86,3 @@ p {margin: 5pt 0 5pt 0;}
 .popup-link{ text-align: center; margin-bottom: 5px; margin-top: 5px;}
 #info-block h2{text-shadow: 1px 2px 3px #808080;}
 .italic{font-style: italic;}
-
-th a {float: right;}
