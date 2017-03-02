@@ -206,7 +206,7 @@ function getCats() {
 		},
 		success: function(data) {//*/
 	$.getJSON('classes.json', function(data) {
-			console.log(data);
+			//console.log(data);
 			var catz = data.results;
 			var catFilter = document.getElementById("catFilter");
 			var h = document.createElement("H3");
