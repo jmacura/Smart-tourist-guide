@@ -61,7 +61,7 @@ function searchPlaceGeoNames(e) {
 	//console.log("shit", e.type);
 	runProgressbar('digestLoader');
 	//console.log(this.place.value);
-	var url = 'http://api.geonames.org/searchJSON';
+	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON';
 	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi&callback=?';
 	$.ajax({
 		dataType: 'json',
@@ -156,7 +156,7 @@ function searchLocation(input) {
 	//runProgressbar("resultsLoader");
 	//console.log(input);
 	//var input = [this.lat.value, this.lon.value, this.r.value]; //[latitude, longitude, radius]
-	var url = 'http://data.plan4all.eu/sparql';
+	var url = (location.protocol == 'https:') ? 'https://data.plan4all.eu/sparql' : 'http://data.plan4all.eu/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
 		"SELECT ?linkThing ?name ?sg AS ?wkt ?category WHERE {\n" +
 		"?linkThing ogcgs:asWKT ?sg;\n" +
