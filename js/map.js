@@ -242,7 +242,7 @@
             cluster.addLayer(layer);
         }
 
-        function refreshLayer(){
+        function refreshLayer(center){
             layerControl.removeLayer(selectAll);
             layerControl.removeLayer(transportation);
             layerControl.removeLayer(foodAndDrink);
@@ -278,4 +278,6 @@
             mymap.addLayer(outdoor);
             mymap.addLayer(professionalAndPublic);
             mymap.addLayer(shoppingAndService);
+
+            mymap.panTo([center[0], center[1]]);
         }

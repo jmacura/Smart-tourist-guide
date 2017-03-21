@@ -1,0 +1,5 @@
+{ "presets": {
+    "defaultLatLon": [13.3510, 49.7245, 1.5],
+    "defaultPlace": "Plzen",
+    "defaultRadius": 3
+} }

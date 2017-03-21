@@ -8,6 +8,7 @@
 var no; //number of searches made during one session
 var destination = null;
 var cats = false;
+var presets; //default form inputs
 
 //defining Event Handlers
 $(document).ready(function(e) {
@@ -15,6 +16,18 @@ $(document).ready(function(e) {
 	document.getElementById('search-by-name').addEventListener('submit', searchPlaceGeoNames);
 	document.getElementById('search-by-latlon').addEventListener('submit', searchLocationHeader);
 	document.getElementById('search-by-position').addEventListener('submit', searchAround);
+	$.getJSON('presets.json', function(data) {
+		presets = data.presets;
+		document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
+		var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
+		inputs[0].value = presets.defaultLatLon[1];
+		inputs[1].value = presets.defaultLatLon[0];
+		inputs[2].value = presets.defaultLatLon[2];
+		document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
+		//console.log(presets);
+	}).fail(function(jqXHR, status, err) {
+		console.log("Failed to load preset values: " + status + " " + err);
+	});
 	//console.log("loaded");
 });
 
@@ -23,7 +36,7 @@ function searchAround(e) {
 	e.preventDefault();
 	var r = this.r.value;
 	if (r > 5 || r <= 0) {
-		printError('Radius has to be positive number smaller than 5');
+		printError("Radius has to be positive number smaller than 5");
 		return;
 	}
 	runProgressbar('resultsLoader');
@@ -61,7 +74,7 @@ function searchPlaceGeoNames(e) {
 	//console.log("shit", e.type);
 	runProgressbar('digestLoader');
 	//console.log(this.place.value);
-	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON';
+	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
 	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi&callback=?';
 	$.ajax({
 		dataType: 'json',
@@ -70,7 +83,7 @@ function searchPlaceGeoNames(e) {
 			console.log(status + err);
 		},
 		success: function(data) {
-			console.log(data);
+			//console.log(data);
 			digest(place, data.geonames);
 			killProgressbar('digestLoader');
 		}
@@ -111,10 +124,10 @@ function digest(input, points) {
  * handles GeoNames result to search in SPOI
  */
 function searchPlaceSPOI(e) {
-	console.log(e);
+	//console.log(e);
 	place = e.target.data;
 	runProgressbar('resultsLoader');
-	searchLocation([place.lat, place.lng, 3]);
+	searchLocation([place.lat, place.lng, (presets.defaultRadius ? presets.defaultRadius : 3)]);
 /**
 	* currently unused part
 	* performs hard regexp matching against SPOI endpoint
@@ -272,7 +285,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	t = document.createTextNode(info + ' km');
 	nfo.appendChild(t);
 
-    //Math.round((latlng[1].slice(0,-1))*1000)/1000
+	//Math.round((latlng[1].slice(0,-1))*1000)/1000
 	
 	var charts = document.createElement("DIV");
 	charts.setAttribute("id", 'charts');
@@ -482,7 +495,6 @@ function showInfo(input, headers, points) { //points is the array of data
 			else {
 				d.appendChild(t);
 			}
-            
 			r.appendChild(d);
 		}
 		//d = document.createElement("TD");
@@ -493,15 +505,14 @@ function showInfo(input, headers, points) { //points is the array of data
 	} // end of for in points
 
 
-   // mymap.addLayer(markersCluster);
+	// mymap.addLayer(markersCluster);
 	//layerControl.addOverlay(markersCluster, "My Points "+no);
-    //console.log(markersList);
-    
-    // Vykreslení markerů v mapě
-    drawMarkers(markersList);
- 
+	//console.log(markersList);
+	// Vykreslení markerů v mapě
+	drawMarkers(markersList, input);
 
-  	//Footer section with export button
+
+	//Footer section with export button
 	var foot = document.createElement("DIV");
 	foot.setAttribute("class", 'to-top');
 	var e = document.createElement("a");
@@ -807,7 +818,7 @@ function moveToMap(){
 	}, 1000);
 }
 
-function drawMarkers(list){
+function drawMarkers(list, input){
     var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
     var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
     for(var l = 0; l < list.length; l++){
@@ -894,6 +905,6 @@ function drawMarkers(list){
     
     mymap.addLayer(markersCluster);
 
-    refreshLayer();      
+    refreshLayer(input);
 }
 
