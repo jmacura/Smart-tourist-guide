@@ -16,18 +16,7 @@ $(document).ready(function(e) {
 	document.getElementById('search-by-name').addEventListener('submit', searchPlaceGeoNames);
 	document.getElementById('search-by-latlon').addEventListener('submit', searchLocationHeader);
 	document.getElementById('search-by-position').addEventListener('submit', searchAround);
-	$.getJSON('presets.json', function(data) {
-		presets = data.presets;
-		document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
-		var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
-		inputs[0].value = presets.defaultLatLon[1];
-		inputs[1].value = presets.defaultLatLon[0];
-		inputs[2].value = presets.defaultLatLon[2];
-		document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
-		//console.log(presets);
-	}).fail(function(jqXHR, status, err) {
-		console.log("Failed to load preset values: " + status + " " + err);
-	});
+	restoreDefaultValues();
 	//console.log("loaded");
 });
 
@@ -35,8 +24,8 @@ $(document).ready(function(e) {
 function searchAround(e) {
 	e.preventDefault();
 	var r = this.r.value;
-	if (r > 5 || r <= 0) {
-		printError("Radius has to be positive number smaller than 5");
+	if (r > 8 || r <= 0) {
+		printError("Radius has to be positive number smaller than 8 (Don't be too greedy)");
 		return;
 	}
 	runProgressbar('resultsLoader');
@@ -163,8 +152,8 @@ function searchPlaceSPOI(e) {
 
 function searchLocationHeader(e) {
 	e.preventDefault();
-	if (this.r.value > 5 || this.r.value <= 0) {
-		printError("Radius has to be positive number smaller than 5");
+	if (this.r.value > 8 || this.r.value <= 0) {
+		printError("Radius has to be positive number smaller than 8 (Don't be too greedy)");
 		return;
 	}
 	runProgressbar('resultsLoader');
@@ -196,6 +185,7 @@ function searchLocation(input) {
 			mymap.setView([input[0], input[1]], 13);
 			showInfo(input, data.head.vars, POIs);
 			killProgressbar('resultsLoader');
+			restoreDefaultValues();
 		}
 	}).fail(function(jqXHR, status, err) {
 			printError("Unable to load data");
@@ -752,6 +742,31 @@ function filterAll(show) {
 				lines[j].style.display = 'none';
 			}
 		}
+	}
+}
+
+function restoreDefaultValues() {
+	if(presets) {
+		document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
+		var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
+		inputs[0].value = presets.defaultLatLon[1];
+		inputs[1].value = presets.defaultLatLon[0];
+		inputs[2].value = presets.defaultLatLon[2];
+		document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
+	}
+	else {
+		$.getJSON('presets.json', function(data) {
+			presets = data.presets;
+			document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
+			var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
+			inputs[0].value = presets.defaultLatLon[1];
+			inputs[1].value = presets.defaultLatLon[0];
+			inputs[2].value = presets.defaultLatLon[2];
+			document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
+			//console.log(presets);
+		}).fail(function(jqXHR, status, err) {
+			console.log("Failed to load preset values: " + status + " " + err);
+		});
 	}
 }
 
