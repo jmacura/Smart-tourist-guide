@@ -79,42 +79,50 @@ function searchPlaceGeoNames(e) {
 	$.ajax({
 		dataType: 'json',
 		url: queryUrl,
-		error: function(jqXHR, status, err) {
-			console.log(status + err);
-		},
 		success: function(data) {
 			//console.log(data);
-			digest(place, data.geonames);
+			digest(place, data);
 			killProgressbar('digestLoader');
 		}
-	});
+	}).fail(function(jqXHR, status, err) {
+			printError("Unable to get list of places");
+			console.log(status, err);
+			killProgressbar('digestLoader');
+		});
 }
 
 function digest(input, points) {
 	var d, r, a;
 	var nfo = document.createElement('DIV');
 	var p = document.createElement('P');
-	p.appendChild(document.createTextNode("Choose from places found:"));
-	nfo.appendChild(p);
-	var t = document.createElement('TABLE');
-	for(var i = 0; i < points.length; i++) {
-		r = document.createElement('TR');
-		d = document.createElement('TD');
-		a = document.createElement('A');
-		a.data = points[i]; //used in searchPlaceSPOI()
-		$(a).on('click', searchPlaceSPOI);
-		$(a).on('click', moveToMap);
-		a.setAttribute("href", '#');
-		a.appendChild(document.createTextNode(points[i].name));
-		d.appendChild(a);
-		r.appendChild(d);
-		d = document.createElement('TD');
-		d.appendChild(document.createTextNode(points[i].fclName + " in " + points[i].countryName));
-		r.appendChild(d);
-		t.appendChild(r);
+	if (points.totalResultsCount == 0) {
+		p.appendChild(document.createTextNode("This place doesn't look like anything to me."));
+		nfo.appendChild(p);
 	}
-	nfo.appendChild(t);
-	//nfo.setAttribute("class", 'digest');
+	else {
+		p.appendChild(document.createTextNode("Choose from places found:"));
+		nfo.appendChild(p);
+		points = points.geonames;
+		var t = document.createElement('TABLE');
+		for(var i = 0; i < points.length; i++) {
+			r = document.createElement('TR');
+			d = document.createElement('TD');
+			a = document.createElement('A');
+			a.data = points[i]; //used in searchPlaceSPOI()
+			$(a).on('click', searchPlaceSPOI);
+			$(a).on('click', moveToMap);
+			a.setAttribute("href", '#');
+			a.appendChild(document.createTextNode(points[i].name));
+			d.appendChild(a);
+			r.appendChild(d);
+			d = document.createElement('TD');
+			d.appendChild(document.createTextNode(points[i].fclName + " in " + points[i].countryName));
+			r.appendChild(d);
+			t.appendChild(r);
+		}
+		nfo.appendChild(t);
+		//nfo.setAttribute("class", 'digest');
+	}
 	var infoBlock = document.getElementById('digest-block');
 	infoBlock.removeChild(infoBlock.firstChild);
 	infoBlock.appendChild(nfo);
@@ -182,17 +190,18 @@ function searchLocation(input) {
 	$.ajax({
 		dataType: 'json',
 		url: queryUrl,
-		error: function(jqXHR, status, err) {
-			console.log(status + err);
-		},
 		success: function(data) {
 			//console.log(data);
 			var POIs = preprocess(data.results.bindings);
 			mymap.setView([input[0], input[1]], 13);
 			showInfo(input, data.head.vars, POIs);
-			killProgressbar("resultsLoader");
+			killProgressbar('resultsLoader');
 		}
-	});
+	}).fail(function(jqXHR, status, err) {
+			printError("Unable to load data");
+			console.log(status, err);
+			killProgressbar('resultsLoader');
+		});
 	//this.reset();
 }
 
@@ -534,11 +543,15 @@ function showInfo(input, headers, points) { //points is the array of data
 	gjsOption.setAttribute("type", 'radio');
 	gjsOption.setAttribute("name", 'type');
 	gjsOption.setAttribute("value", 'geojson');
+	var gpxOption = document.createElement("INPUT");
+	gpxOption.setAttribute("type", 'radio');
+	gpxOption.setAttribute("name", 'type');
+	gpxOption.setAttribute("value", 'gpx');
+	gpxOption.setAttribute("checked", '');
 	var kmlOption = document.createElement("INPUT");
 	kmlOption.setAttribute("type", 'radio');
 	kmlOption.setAttribute("name", 'type');
 	kmlOption.setAttribute("value", 'kml');
-	kmlOption.setAttribute("checked", '');
 	var sendBtn = document.createElement("INPUT");
 	sendBtn.setAttribute("type", 'submit');
 	sendBtn.setAttribute("class", 'btn btn-default');
@@ -548,6 +561,10 @@ function showInfo(input, headers, points) { //points is the array of data
 	exporter.appendChild(gjsOption);
 	var span = document.createElement("SPAN");
 	span.appendChild(document.createTextNode("GeoJSON"));
+	exporter.appendChild(span);
+	exporter.appendChild(gpxOption);
+	var span = document.createElement("SPAN");
+	span.appendChild(document.createTextNode("GPX"));
 	exporter.appendChild(span);
 	exporter.appendChild(kmlOption);
 	var span = document.createElement("SPAN");
@@ -625,15 +642,23 @@ function saveData(e) {
 	}
 	this.getElementsByTagName("BUTTON")[0].style.display = 'inline-block';
 	var resultset = this.id;
-	if(this.type.value == 'geojson') {
-		dataBlob = new Blob([sessionStorage.getItem(resultset)], {type: "application/sgeo+json;charset=utf-8"})
-		saveAs(dataBlob, 'points_' + resultset + '.geojson');
-	} else if(this.type.value == 'kml') {
-		var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)), {documentName: 'Points of interest', documentDescription: 'Generated by Smart Tourist Guide', name: 'name.value'});
-		dataBlob = new Blob([kml], {type: "application/vnd.google-earth.kml+xml;charset=utf-8"})
-		saveAs(dataBlob, 'points_' + resultset + '.kml');
-	} else {
-		printError('Error exporting the data');
+	switch(this.type.value) {
+		case 'geojson':
+			dataBlob = new Blob([sessionStorage.getItem(resultset)], {type: "application/sgeo+json;charset=utf-8"})
+			saveAs(dataBlob, 'points_' + resultset + '.geojson');
+			break;
+		case 'gpx':
+			var gpx = togpx(JSON.parse(sessionStorage.getItem(resultset)));
+			dataBlob = new Blob([gpx], {type: "application/gpx+xml;charset=utf-8"})
+			saveAs(dataBlob, 'points_' + resultset + '.gpx');
+			break;
+		case 'kml':
+			var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)), {documentName: 'Points of interest', documentDescription: 'Generated by Smart Tourist Guide', name: 'name.value'});
+			dataBlob = new Blob([kml], {type: "application/vnd.google-earth.kml+xml;charset=utf-8"})
+			saveAs(dataBlob, 'points_' + resultset + '.kml');
+			break;
+		default:
+			printError('Error exporting the data');
 	}
 }
 
