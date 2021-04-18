@@ -1,5 +1,6 @@
 
 
+//TODO: Hydda not loading
 var Hydda = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
 	attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 });
@@ -15,9 +16,9 @@ var OpenCycleMap = L.tileLayer('http://{s}.tile.thunderforest.com/cycle/{z}/{x}/
 var mypoints = new L.LayerGroup();
 
 var baseMaps = {
-	"Hydda": Hydda,
+	//"Hydda": Hydda,
 	"OpenStreetMap Carto": OpenStreetMap,
-	"OpenCycloMap": OpenCycleMap
+	"OpenCycleMap": OpenCycleMap
 };
 
 var overlayMaps = {
@@ -25,7 +26,7 @@ var overlayMaps = {
 };
 
 var mymap = new L.Map('mapid', {
-	layers: [Hydda],
+	layers: [OpenStreetMap],
 	center: [49.75, 13.35],
 	zoom: 13,
 	fullscreenControl: true
