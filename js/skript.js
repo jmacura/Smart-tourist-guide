@@ -124,7 +124,7 @@ function searchPlaceSPOI(e) {
 	//console.log(e);
 	place = e.target.data;
 	runProgressbar('resultsLoader');
-	searchLocation([place.lat, place.lng, (presets.defaultRadius ? presets.defaultRadius : 3)]);
+	searchLocation([place.lat, place.lng, (presets && presets.defaultRadius ? presets.defaultRadius : 3)]);
 /**
 	* currently unused part
 	* performs hard regexp matching against SPOI endpoint
