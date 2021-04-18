@@ -64,7 +64,7 @@ function searchPlaceGeoNames(e) {
 	runProgressbar('digestLoader');
 	//console.log(this.place.value);
 	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
-	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi&callback=?';
+	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi';
 	$.ajax({
 		dataType: 'json',
 		url: queryUrl,
