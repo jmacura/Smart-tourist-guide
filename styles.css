@@ -56,10 +56,11 @@ th a {float: right;}
 
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}
 
-#charts {margin: 0 auto; height: 330px; width: 100%; text-align: center;}
+#charts {margin: 0 auto; height: 200px; width: 100%; text-align: center;}
 #forecast {height: 100%; width: 100%; text-align: center; margin: 0 auto;}
 #forecast img {width: 100%;}
-#forecast table{margin: 0 auto;}
+#forecast table {margin: 0 auto;}
+#forecast td {padding: 1em;}
 
 #mapid {margin-top: 0px; margin-bottom: 20px;  height: 470px; width: 100%; z-index: 1;  }
 .subtitle {font-size: 40px; text-shadow: 2px 2px 5px #808080; margin-bottom: 20px; }

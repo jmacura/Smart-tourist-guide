@@ -312,20 +312,28 @@ function showInfo(input, headers, points) { //points is the array of data
 	var forecast = document.createElement("DIV");
 	forecast.setAttribute("id", 'forecast');
 	charts.appendChild(forecast);
-	phpUrl = './getWeather.php?lat=' + input[0] + '&lon=' + input[1];
+	yrNoUrl = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' + input[0] + '&lon=' + input[1];
 	//phpUrl = 'predpoved2.xml'; //ONLY FOR LOCAL TESTINGS
+	UAIdentification = 'Smart-tourist-guide github.com/jmacura/Smart-tourist-guide'
 	$.ajax({
-		dataType: 'xml',
-		url: phpUrl,
+		headers: {
+			//"User-Agent": UAIdentification,
+			"Origin": UAIdentification
+		},
+		//dataType: 'jsonp',
+		crossDomain: true,
+		/*xhrFields: {
+			withCredentials: true
+		},*/
+		url: yrNoUrl,
 		error: function(jqXHR, status, err) { //if weather API does not work
 			var p = document.createElement("P");
 			p.appendChild(document.createTextNode('Error obtaining weather forecast: ' + status));
 			forecast.appendChild(p);
 		},
 		success: function(data) {
-			var obj = xmlToJson(data.firstChild);
-			//console.log(obj);
-			var weather = parseWeather(obj); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
+			console.log(data);
+			var weather = parseWeather(data); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
 			//console.log(weather);
 			var h = document.createElement("H3");
 			h.appendChild(document.createTextNode('Weather forecast in the location for the upcoming 48 hours'));
@@ -334,27 +342,27 @@ function showInfo(input, headers, points) { //points is the array of data
 			for(var i = 0; i < weather.length; i++) {
 				d = document.createElement("TD");
 				p = document.createElement("P");
-				p.appendChild(document.createTextNode(weather[i][0].slice(3,5) == new Date().getDate() ? 'today' : weather[i][0])) //den
+				p.appendChild(document.createTextNode(weather[i][0].slice(3,5) == new Date().getDate() ? 'today' : weather[i][0])) //day
 				d.appendChild(p);
 				p = document.createElement("P");
 				var printtime = weather[i][1] + '–' + (weather[i][1]+6); //forecasted time interval
 				p.appendChild(document.createTextNode(printtime));
 				d.appendChild(p);
-				var img = document.createElement("IMG"); //image of weather condition
-				var night = ((weather[i][1] == 18 || weather[i][1] == 0) ? true : false);
-				var imgSrc = 'http://api.met.no/weatherapi/weathericon/1.1/?symbol=' + weather[i][2] + ';' + (night ? 'is_night=1;' : '') + 'content_type=image/svg%2Bxml';
-				img.setAttribute("src", imgSrc);
-				d.append(img);
-				var maxT = 'max: ' + weather[i][4] + ' °C';
+				//var img = document.createElement("IMG"); //image of weather condition
+				//var night = ((weather[i][1] == 18 || weather[i][1] == 0) ? true : false);
+				//var imgSrc = 'http://api.met.no/weatherapi/weathericon/2.0/?symbol=' + weather[i][2] + ';' + (night ? 'is_night=1;' : '') + 'content_type=image/svg%2Bxml';
+				//img.setAttribute("src", imgSrc);
+				//d.append(img);
+				var maxT = /*'max: ' +*/ weather[i][4] + ' °C';
 				p = document.createElement("P");
 				p.setAttribute("class",'tmax');
 				p.appendChild(document.createTextNode(maxT)); //max temperature in interval
 				d.appendChild(p);
-				var minT = 'min: ' + weather[i][3] + ' °C';
-				p = document.createElement("P");
-				p.setAttribute("class",'tmin');
-				p.appendChild(document.createTextNode(minT)); //min temperature in interval
-				d.appendChild(p);
+				//var minT = 'min: ' + weather[i][3] + ' °C';
+				//p = document.createElement("P");
+				//p.setAttribute("class",'tmin');
+				//p.appendChild(document.createTextNode(minT)); //min temperature in interval
+				//d.appendChild(p);
 				r.appendChild(d);
 			}
 			var tab = document.createElement("TABLE");
@@ -684,21 +692,23 @@ function killProgressbar(name) {
 	$( "#" + name ).progressbar( "destroy" );
 }
 
+/**
+ * TODO: this all is not well parsed. Desinterpretation of data is likely
+ * TODO: min and max are no longer returned as they used to
+ * TODO: icons are no longer available via API (only direct download)
+ */
 function parseWeather(obj) {
-	var pointData = obj.product.time;
+	var pointData = obj.properties.timeseries;
 	var weatherArr = []; //each row has [date of origin time, origin time, symbol, minT, maxT]
 	var j = 0;
 	for(var i = 0; i < pointData.length && j < 8; i++) {
-		var t = pointData[i].location;
-		var d = pointData[i]['@attributes'].from.slice(5,10);
-		var fromH = Number(pointData[i]['@attributes'].from.slice(11,13));
-		var toH = Number(pointData[i]['@attributes'].to.slice(11,13));
-		if(t.symbol && (toH % 6 == 0) && ((toH == 00 ? 24 : toH)-fromH == 6)) {
-			weatherArr[j++] = [d, fromH, t.symbol['@attributes'].number, t.minTemperature['@attributes'].value, t.maxTemperature['@attributes'].value]; //array of length 8 ???
-			//console.log(weatherArr[j-1]);
-		}
+		var t = pointData[i].data;
+		var d = pointData[i].time.split('T')[0].slice(5);
+		var fromH = Number(pointData[i].time.split('T')[1].split(':')[0]);
+		weatherArr[j++] = [d, fromH, t.next_6_hours.summary.symbol_code, 0, t.instant.details.air_temperature]; //array of length 8 ???
+		console.log(weatherArr[j-1]);
 	}
-	//console.log(weatherArr.length);
+	console.log(weatherArr.length);
 	return weatherArr;
 }
 
