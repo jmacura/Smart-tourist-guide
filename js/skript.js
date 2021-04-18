@@ -1,8 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+/** This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-// @author jmacura 2016-2017
-// @author jachymkellar 2017
+/** @author jmacura 2016-2017 */
+/** @author jachymkellar 2017 */
 
 // global variables
 var no; //number of searches made during one session
@@ -166,13 +166,15 @@ function searchLocation(input) {
 	//runProgressbar("resultsLoader");
 	//console.log(input);
 	//var input = [this.lat.value, this.lon.value, this.r.value]; //[latitude, longitude, radius]
-	var url = (location.protocol == 'https:') ? 'https://data.plan4all.eu/sparql' : 'http://data.plan4all.eu/sparql';
+	//var url = (location.protocol == 'https:') ? 'https://data.plan4all.eu/sparql' : 'http://data.plan4all.eu/sparql';
+	var url = (location.protocol == 'https:') ? 'https://www.foodie-cloud.org/sparql' : 'https://www.foodie-cloud.org/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
-		"SELECT ?linkThing ?name ?sg AS ?wkt ?category WHERE {\n" +
+		"SELECT ?linkThing ?name ?sg AS ?wkt ?category FROM\n" +
+		"<http://www.sdi4apps.eu/poi.rdf> WHERE {\n" +
 		"?linkThing ogcgs:asWKT ?sg;\n" +
 		" rdfs:label ?name.\n" +
 		" FILTER(bif:st_intersects (?sg, bif:st_point (" + input[1] + ", " + input[0] + "), " + input[2] + ")).\n" +
-		" OPTIONAL {?linkThing poi:class ?category .}\n" +
+		" OPTIONAL {?linkThing a ?category .}\n" +
 		"}";
 	console.log(query);
 	var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
