@@ -216,7 +216,10 @@ function getCats() {
 		$("#catFilter").addClass('hidden')
 	}
 	if (cats) {
-		showCats();
+		console.log($("#catFilter").childNodes.length);
+		if ($("#catFilter").childNodes.length < 2) {
+			createCats();
+		}
 		return;
 	};
 	runProgressbar('catProgress');
@@ -239,14 +242,14 @@ function getCats() {
 	$.getJSON('classes.json', function (data) {
 		cats = data.results;
 		//console.log(data);
-		showCats();
+		createCats();
 	}).fail(function (jqXHR, status, err) {
 		printError("Failed to get category list: " + status + " " + err);
 		killProgressbar('catProgress');
 	});
 }
 
-function showCats() {
+function createCats() {
 	var catFilter = document.getElementById("catFilter");
 	var h = document.createElement("H3");
 	h.appendChild(document.createTextNode("Select/deselect categories to display"));
