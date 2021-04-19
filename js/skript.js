@@ -64,7 +64,8 @@ function searchPlaceGeoNames(e) {
 	//console.log("shit", e.type);
 	runProgressbar('digestLoader');
 	//console.log(this.place.value);
-	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
+	//var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
+	var url = 'http://api.geonames.org/searchJSON';
 	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi';
 	$.ajax({
 		headers: {
