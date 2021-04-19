@@ -216,8 +216,8 @@ function getCats() {
 		$("#catFilter").addClass('hidden')
 	}
 	if (cats) {
-		console.log($("#catFilter").childNodes.length);
-		if ($("#catFilter").childNodes.length < 2) {
+		console.log($("#catFilter").children().length);
+		if ($("#catFilter").children().length < 2) {
 			createCats();
 		}
 		return;
