@@ -12,7 +12,7 @@ var presets; //default form inputs
 var UAIdentification = 'Smart-tourist-guide github.com/jmacura/Smart-tourist-guide';
 
 //defining Event Handlers
-$(document).ready(function(e) {
+$(document).ready(function (e) {
 	no = 0; //reset the number when the page reloads
 	document.getElementById('search-by-name').addEventListener('submit', searchPlaceGeoNames);
 	document.getElementById('search-by-latlon').addEventListener('submit', searchLocationHeader);
@@ -30,17 +30,17 @@ function searchAround(e) {
 		return;
 	}
 	runProgressbar('resultsLoader');
-	if(!navigator.geolocation) {
+	if (!navigator.geolocation) {
 		console.log("not possible in your browser");
 		killProgressbar('resultsLoader');
 		return;
 	}
-	navigator.geolocation.getCurrentPosition(function(position) {
+	navigator.geolocation.getCurrentPosition(function (position) {
 		//console.log(position)
 		searchLocation([position.coords.latitude, position.coords.longitude, r]);
-		}, function(error) {
+	}, function (error) {
 		killProgressbar('resultsLoader');
-		switch(error.code) {
+		switch (error.code) {
 			case error.PERMISSION_DENIED:
 				printError("User denied the request for Geolocation."); break;
 			case error.POSITION_UNAVAILABLE:
@@ -50,14 +50,14 @@ function searchAround(e) {
 			case error.UNKNOWN_ERROR:
 				printError("An unknown error occurred."); break;
 		}
-		}, {enableHighAccuracy: false, timeout: 5000, maximumAge: 0}
+	}, { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 }
 	); //5 000 ms timeout
 }
 
 function searchPlaceGeoNames(e) {
 	e.preventDefault();
 	var place = this.place.value;
-	if(place.length <= 1) {
+	if (place.length <= 1) {
 		printError("Please, provide at least 2 characters");
 		return;
 	}
@@ -66,7 +66,7 @@ function searchPlaceGeoNames(e) {
 	//console.log(this.place.value);
 	//var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
 	var url = 'https://secure.geonames.org/searchJSON';
-	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi';
+	var queryUrl = url + '?q=' + encodeURIComponent(place) + '&fuzzy=0.8&isNameRequired=true&username=spoi';
 	$.ajax({
 		headers: {
 			//"User-Agent": UAIdentification,
@@ -75,16 +75,16 @@ function searchPlaceGeoNames(e) {
 		dataType: 'json',
 		crossDomain: true,
 		url: queryUrl,
-		success: function(data) {
+		success: function (data) {
 			//console.log(data);
 			digest(place, data);
 			killProgressbar('digestLoader');
 		}
-	}).fail(function(jqXHR, status, err) {
-			printError("Unable to get list of places");
-			console.log(status, err);
-			killProgressbar('digestLoader');
-		});
+	}).fail(function (jqXHR, status, err) {
+		printError("Unable to get list of places");
+		console.log(status, err);
+		killProgressbar('digestLoader');
+	});
 }
 
 function digest(input, points) {
@@ -100,7 +100,7 @@ function digest(input, points) {
 		nfo.appendChild(p);
 		points = points.geonames;
 		var t = document.createElement('TABLE');
-		for(var i = 0; i < points.length; i++) {
+		for (var i = 0; i < points.length; i++) {
 			r = document.createElement('TR');
 			d = document.createElement('TD');
 			a = document.createElement('A');
@@ -132,29 +132,29 @@ function searchPlaceSPOI(e) {
 	place = e.target.data;
 	runProgressbar('resultsLoader');
 	searchLocation([place.lat, place.lng, (presets && presets.defaultRadius ? presets.defaultRadius : 3)]);
-/**
-	* currently unused part
-	* performs hard regexp matching against SPOI endpoint
-	*/
-/*var url = 'http://data.plan4all.eu/sparql';
-	var query = 'SELECT DISTINCT ?linkThing ?name ?wkt \n' +
-		'WHERE {\n' +
-		' ?linkThing rdfs:label ?name.\n' +
-		' FILTER regex(?name, "' + place + '", "i").\n' +
-		' ?linkThing ogcgs:asWKT ?wkt\n' +
-		'}';
-		console.log(query);
-	var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
-	$.ajax({
-		dataType: 'json',
-		url: queryUrl,
-		success: function(data) {
-			var POIs = data.results.bindings;
-			console.log(data);
-			showInfo([place], data.head.vars, POIs);
-			killProgressbar("resultsLoader");
-		}
-	});*/
+	/**
+		* currently unused part
+		* performs hard regexp matching against SPOI endpoint
+		*/
+	/*var url = 'http://data.plan4all.eu/sparql';
+		var query = 'SELECT DISTINCT ?linkThing ?name ?wkt \n' +
+			'WHERE {\n' +
+			' ?linkThing rdfs:label ?name.\n' +
+			' FILTER regex(?name, "' + place + '", "i").\n' +
+			' ?linkThing ogcgs:asWKT ?wkt\n' +
+			'}';
+			console.log(query);
+		var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
+		$.ajax({
+			dataType: 'json',
+			url: queryUrl,
+			success: function(data) {
+				var POIs = data.results.bindings;
+				console.log(data);
+				showInfo([place], data.head.vars, POIs);
+				killProgressbar("resultsLoader");
+			}
+		});*/
 }
 
 function searchLocationHeader(e) {
@@ -184,11 +184,11 @@ function searchLocation(input) {
 		" OPTIONAL {?linkThing a ?category .}\n" +
 		"}";
 	console.log(query);
-	var queryUrl = url+'?query='+encodeURIComponent(query)+'&format=json&callback=?';
+	var queryUrl = url + '?query=' + encodeURIComponent(query) + '&format=json&callback=?';
 	$.ajax({
 		dataType: 'json',
 		url: queryUrl,
-		success: function(data) {
+		success: function (data) {
 			//console.log(data);
 			var POIs = preprocess(data.results.bindings);
 			mymap.setView([input[0], input[1]], 13);
@@ -196,11 +196,11 @@ function searchLocation(input) {
 			killProgressbar('resultsLoader');
 			restoreDefaultValues();
 		}
-	}).fail(function(jqXHR, status, err) {
-			printError("Unable to load data");
-			console.log(status, err);
-			killProgressbar('resultsLoader');
-		});
+	}).fail(function (jqXHR, status, err) {
+		printError("Unable to load data");
+		console.log(status, err);
+		killProgressbar('resultsLoader');
+	});
 	//this.reset();
 }
 
@@ -236,11 +236,11 @@ function getCats() {
 			killProgressbar('catProgress');
 		},
 		success: function(data) {//*/
-	$.getJSON('classes.json', function(data) {
-			cats = data.results;
-			//console.log(data);
-			showCats();
-	}).fail(function(jqXHR, status, err) {
+	$.getJSON('classes.json', function (data) {
+		cats = data.results;
+		//console.log(data);
+		showCats();
+	}).fail(function (jqXHR, status, err) {
 		printError("Failed to get category list: " + status + " " + err);
 		killProgressbar('catProgress');
 	});
@@ -248,44 +248,44 @@ function getCats() {
 
 function showCats() {
 	var catFilter = document.getElementById("catFilter");
-			var h = document.createElement("H3");
-			h.appendChild(document.createTextNode("Select/deselect categories to display"));
-			catFilter.appendChild(h);
-			var ls = document.createElement("UL");
-			var deselector = document.createElement("INPUT");
-			deselector.setAttribute("type", 'checkbox');
-			deselector.setAttribute("checked", '');
-			$(deselector).on('change', function() {
-				//console.log(this);
-				$(this.parentNode.getElementsByTagName("INPUT")).prop('checked', $(this).prop('checked'));
-				filterAll($(this).prop('checked')); //if the input is checked -> show all/ if unchecked -> hide all
-			});
-			var em = document.createElement("STRONG");
-			em.appendChild(document.createTextNode("Un/check all"));
-			ls.appendChild(deselector);
-			ls.appendChild(em);
-			ls.appendChild(document.createElement("BR"));
-			var cat = '';
-			for(var i = 0; i < cats.length; i++) {
-				if(cat == cats[i].mainClass.value.slice(32)) {
-					continue;
-				}
-				cat = cats[i].mainClass.value.slice(32);
-				//console.log(cat);
-				var li = document.createElement("INPUT");
-				li.setAttribute("type", 'checkbox');
-				li.setAttribute("value", cat);
-				li.setAttribute("checked", '');
-				li.setAttribute("class", 'classItem');
-				$(li).on('change', filter);
-				ls.appendChild(li);
-				ls.appendChild(document.createTextNode(cat.replace(/_/g, " ")));
-				ls.appendChild(document.createElement("BR"));
-			}
-			catFilter.appendChild(ls);
-			killProgressbar('catProgress');
-			//showInfo(input, data.head.vars, POIs);
-			//killProgressbar("resultsLoader");
+	var h = document.createElement("H3");
+	h.appendChild(document.createTextNode("Select/deselect categories to display"));
+	catFilter.appendChild(h);
+	var ls = document.createElement("UL");
+	var deselector = document.createElement("INPUT");
+	deselector.setAttribute("type", 'checkbox');
+	deselector.setAttribute("checked", '');
+	$(deselector).on('change', function () {
+		//console.log(this);
+		$(this.parentNode.getElementsByTagName("INPUT")).prop('checked', $(this).prop('checked'));
+		filterAll($(this).prop('checked')); //if the input is checked -> show all/ if unchecked -> hide all
+	});
+	var em = document.createElement("STRONG");
+	em.appendChild(document.createTextNode("Un/check all"));
+	ls.appendChild(deselector);
+	ls.appendChild(em);
+	ls.appendChild(document.createElement("BR"));
+	var cat = '';
+	for (var i = 0; i < cats.length; i++) {
+		if (cat == cats[i].mainClass.value.slice(32)) {
+			continue;
+		}
+		cat = cats[i].mainClass.value.slice(32);
+		//console.log(cat);
+		var li = document.createElement("INPUT");
+		li.setAttribute("type", 'checkbox');
+		li.setAttribute("value", cat);
+		li.setAttribute("checked", '');
+		li.setAttribute("class", 'classItem');
+		$(li).on('change', filter);
+		ls.appendChild(li);
+		ls.appendChild(document.createTextNode(cat.replace(/_/g, " ")));
+		ls.appendChild(document.createElement("BR"));
+	}
+	catFilter.appendChild(ls);
+	killProgressbar('catProgress');
+	//showInfo(input, data.head.vars, POIs);
+	//killProgressbar("resultsLoader");
 }
 
 // **** Background support for displaying info ****
@@ -300,15 +300,15 @@ function showInfo(input, headers, points) { //points is the array of data
 	//print heading
 	nfo = document.createElement("H2");
 	var info = 'Results for ';
-	for(var i = 0; i < input.length; i++) {
-		if(i > 0) {info += " "};
-		info += Math.round(input[i]*10000)/10000;
+	for (var i = 0; i < input.length; i++) {
+		if (i > 0) { info += " " };
+		info += Math.round(input[i] * 10000) / 10000;
 	}
 	t = document.createTextNode(info + ' km');
 	nfo.appendChild(t);
 
 	//Math.round((latlng[1].slice(0,-1))*1000)/1000
-	
+
 	var charts = document.createElement("DIV");
 	charts.setAttribute("id", 'charts');
 
@@ -346,12 +346,12 @@ function showInfo(input, headers, points) { //points is the array of data
 			withCredentials: true
 		},*/
 		url: yrNoUrl,
-		error: function(jqXHR, status, err) { //if weather API does not work
+		error: function (jqXHR, status, err) { //if weather API does not work
 			var p = document.createElement("P");
 			p.appendChild(document.createTextNode('Error obtaining weather forecast: ' + status));
 			forecast.appendChild(p);
 		},
-		success: function(data) {
+		success: function (data) {
 			console.log(data);
 			var weather = parseWeather(data); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
 			//console.log(weather);
@@ -359,13 +359,13 @@ function showInfo(input, headers, points) { //points is the array of data
 			h.appendChild(document.createTextNode('Weather forecast in the location for the upcoming 48 hours'));
 			forecast.appendChild(h);
 			r = document.createElement("TR");
-			for(var i = 0; i < weather.length; i++) {
+			for (var i = 0; i < weather.length; i++) {
 				d = document.createElement("TD");
 				p = document.createElement("P");
-				p.appendChild(document.createTextNode(weather[i][0].slice(3,5) == new Date().getDate() ? 'today' : weather[i][0])) //day
+				p.appendChild(document.createTextNode(weather[i][0].slice(3, 5) == new Date().getDate() ? 'today' : weather[i][0])) //day
 				d.appendChild(p);
 				p = document.createElement("P");
-				var printtime = weather[i][1] + '–' + (weather[i][1]+6 > 24 ? weather[i][1]+6-24 : weather[i][1]+6); //forecasted time interval
+				var printtime = weather[i][1] + '–' + (weather[i][1] + 6 > 24 ? weather[i][1] + 6 - 24 : weather[i][1] + 6); //forecasted time interval
 				p.appendChild(document.createTextNode(printtime));
 				d.appendChild(p);
 				//var img = document.createElement("IMG"); //image of weather condition
@@ -375,7 +375,7 @@ function showInfo(input, headers, points) { //points is the array of data
 				//d.append(img);
 				var maxT = /*'max: ' +*/ weather[i][4] + ' °C';
 				p = document.createElement("P");
-				p.setAttribute("class",'tmax');
+				p.setAttribute("class", 'tmax');
 				p.appendChild(document.createTextNode(maxT)); //max temperature in interval
 				d.appendChild(p);
 				//var minT = 'min: ' + weather[i][3] + ' °C';
@@ -395,7 +395,7 @@ function showInfo(input, headers, points) { //points is the array of data
 		}
 	});
 
-//Category filtering
+	//Category filtering
 	var catFilter = document.createElement("DIV");
 	catFilter.setAttribute("id", 'catFilter');
 	catFilter.setAttribute("class", 'hidden');
@@ -409,12 +409,12 @@ function showInfo(input, headers, points) { //points is the array of data
 	ls.setAttribute("class", 'table-results');
 	//set headers
 	r = document.createElement("TR");
-	for(var i = 0; i < heads[1].length; i++) {
+	for (var i = 0; i < heads[1].length; i++) {
 		d = document.createElement("TH");
 		d.setAttribute("class", 'results-heading');
 		t = document.createTextNode(heads[1][i]);
 		d.appendChild(t);
-		if(heads[1][i] == "category") {
+		if (heads[1][i] == "category") {
 			var aCat = document.createElement("A");
 			aCat.setAttribute("href", '##');
 			aCat.appendChild(document.createTextNode(' (Filter)'));
@@ -430,10 +430,10 @@ function showInfo(input, headers, points) { //points is the array of data
 	//var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
 	//var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
 	//var mypoints = new L.LayerGroup();
-    //var markersCluster = L.markerClusterGroup();
-    var markersList = [];  // array of objects
-    
-	for(var i in points) {
+	//var markersCluster = L.markerClusterGroup();
+	var markersList = [];  // array of objects
+
+	for (var i in points) {
 		if (!points.hasOwnProperty(i)) {
 			continue; //the current property is not a direct property of p
 		}
@@ -444,54 +444,54 @@ function showInfo(input, headers, points) { //points is the array of data
 		r = document.createElement("TR");
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
-          
-        var markerObject = {lat: "",long: "", title: "", name: "", mainCategory: "", subCategory: "", list: ""}; // objekt reprezentující marker
-        markerObject.lat = latlng[1].slice(0,-1);
-        markerObject.long = latlng[0].slice(6);
-        markerObject.title = objName2;
-        markerObject.name = objName;
-        markerObject.list = points[i]['category'].list;
-             
-        if(typeof points[i]['category'].list !== 'undefined'){
-            var category1 = points[i]['category'].list[0].substring(32).replace(/_/g, " ");
-            var category2 = points[i]['category'].list[1].substring(32).replace(/_/g, " ");   
-            if(category1 == "car service" || category1 == "culture and entertainment" || category1 == "food and drink" || category1 == "lodging" || category1 == "natural feature" || category1 == "other" || category1 == "outdoor" || category1 == "professional and public" || category1 == "shopping and service" || category1 == "transportation"){
-                markerObject.mainCategory = category1;
-            }
-            else{
-                markerObject.subCategory = category1;
-            }
-            
-            if(category2 == "car service" || category2 == "culture and entertainment" || category2 == "food and drink" || category2 == "lodging" || category2 == "natural feature" || category2 == "other" || category2 == "outdoor" || category2 == "professional and public" || category2 == "shopping and service" || category2 == "transportation"){
-                markerObject.mainCategory = category2;
-            }
-            else{
-                markerObject.subCategory = category2;
-            }
-        }
-        else{
-            markerObject.mainCategory =  objCategory;
-        }
-        markersList.push(markerObject); // add object (marker) to markersList array
-           
-        /*
-		if(no < 12){
-			var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
-           // markersList.push(m);
+
+		var markerObject = { lat: "", long: "", title: "", name: "", mainCategory: "", subCategory: "", list: "" }; // objekt reprezentující marker
+		markerObject.lat = latlng[1].slice(0, -1);
+		markerObject.long = latlng[0].slice(6);
+		markerObject.title = objName2;
+		markerObject.name = objName;
+		markerObject.list = points[i]['category'].list;
+
+		if (typeof points[i]['category'].list !== 'undefined') {
+			var category1 = points[i]['category'].list[0].substring(32).replace(/_/g, " ");
+			var category2 = points[i]['category'].list[1].substring(32).replace(/_/g, " ");
+			if (category1 == "car service" || category1 == "culture and entertainment" || category1 == "food and drink" || category1 == "lodging" || category1 == "natural feature" || category1 == "other" || category1 == "outdoor" || category1 == "professional and public" || category1 == "shopping and service" || category1 == "transportation") {
+				markerObject.mainCategory = category1;
+			}
+			else {
+				markerObject.subCategory = category1;
+			}
+
+			if (category2 == "car service" || category2 == "culture and entertainment" || category2 == "food and drink" || category2 == "lodging" || category2 == "natural feature" || category2 == "other" || category2 == "outdoor" || category2 == "professional and public" || category2 == "shopping and service" || category2 == "transportation") {
+				markerObject.mainCategory = category2;
+			}
+			else {
+				markerObject.subCategory = category2;
+			}
 		}
-		else{
-			var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: colorFallback});
-           // markersList.push(m);
+		else {
+			markerObject.mainCategory = objCategory;
 		}
-		m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Table info<a/></div>");
-		m.name = objName;
-		//m.on('click', navigateTo);
-		//m.addTo(mypoints);
-        markersCluster.addLayer(m);
-        */
+		markersList.push(markerObject); // add object (marker) to markersList array
+
+		/*
+if(no < 12){
+	var m = L.marker([latlng[1].slice(0,-1), latlng[0].slice(6)], {icon: color[no]});
+			 // markersList.push(m);
+}
+else{
+	var m = L.circleMarker([latlng[1].slice(0,-1), latlng[0].slice(6)], {radius: 7, color: colorFallback});
+			 // markersList.push(m);
+}
+m.bindPopup("<div class=popup-title>"+objName2+"</div><div class=popup-info>"+Math.round((latlng[1].slice(0,-1))*1000)/1000+" "+Math.round((latlng[0].slice(6))*1000)/1000+"</div><div class=popup-info>"+objCategory+"</div><div class=popup-link><a href=#"+objName+">Table info<a/></div>");
+m.name = objName;
+//m.on('click', navigateTo);
+//m.addTo(mypoints);
+		markersCluster.addLayer(m);
+		*/
 
 		//console.log(lat, lng);
-		for(var j = 0; j < heads[1].length; j++) {
+		for (var j = 0; j < heads[1].length; j++) {
 			d = document.createElement("TD");
 			var a = document.createElement("A");
 			a.setAttribute("name", objName);
@@ -499,10 +499,10 @@ function showInfo(input, headers, points) { //points is the array of data
 			//console.log(j, heads[1][j]);
 			var txt = '';
 			//console.log(points[i][heads[1][j]]);
-			if(points[i][heads[1][j]].list) {
-			//If there is more then 1 category, then they are in the list attribute
-				for(var k = 0; k < points[i][heads[1][j]].list.length; k++) {
-					if(txt.length > 1) {
+			if (points[i][heads[1][j]].list) {
+				//If there is more then 1 category, then they are in the list attribute
+				for (var k = 0; k < points[i][heads[1][j]].list.length; k++) {
+					if (txt.length > 1) {
 						txt += ', ';
 					}
 					appendAttribute(r, "class", points[i][heads[1][j]].list[k].slice(32));
@@ -515,8 +515,8 @@ function showInfo(input, headers, points) { //points is the array of data
 			else {
 				txt = points[i][heads[1][j]].value; // If the object has no name => print ---
 			}
-			t = document.createTextNode( (points[i][heads[1][j]]) ? txt : '---');
-			if(heads[0][j]) {
+			t = document.createTextNode((points[i][heads[1][j]]) ? txt : '---');
+			if (heads[0][j]) {
 				l = document.createElement("A");
 				l.setAttribute("href", points[i][heads[0][j]].value);
 				l.setAttribute("target", '_blank');
@@ -550,7 +550,7 @@ function showInfo(input, headers, points) { //points is the array of data
 	e.setAttribute("onclick", 'moveToMap()');
 	foot.appendChild(e);
 	var k = document.createElement("span");
-	k.setAttribute("class",'glyphicon glyphicon-chevron-up');
+	k.setAttribute("class", 'glyphicon glyphicon-chevron-up');
 	e.appendChild(k);
 
 	var exporter = document.createElement("FORM");
@@ -615,8 +615,8 @@ function preprocess(arr) {
 	var obj = {};
 	var geojs = [];
 	var k = 0;
-	for(var i = 0; i <arr.length; i++) {
-		if(obj[arr[i].linkThing.value]) { //if the object already exist..
+	for (var i = 0; i < arr.length; i++) {
+		if (obj[arr[i].linkThing.value]) { //if the object already exist..
 			obj[arr[i].linkThing.value].category.list = [obj[arr[i].linkThing.value].category.value, arr[i].category.value]; //..then only create array of categories
 			//console.log(obj[arr[i].linkThing.value].category.list);
 		}
@@ -625,20 +625,20 @@ function preprocess(arr) {
 		}
 	}
 	var k = 0;
-	for(var i in obj) {
-	var props = {};
-		for(var j in obj[i]) {
-			if(!obj[i].hasOwnProperty(j) || (obj[i][j] && obj[i][j].datatype == 'http://www.openlinksw.com/schemas/virtrdf#Geometry')) { //skip subproperties & geometry type
+	for (var i in obj) {
+		var props = {};
+		for (var j in obj[i]) {
+			if (!obj[i].hasOwnProperty(j) || (obj[i][j] && obj[i][j].datatype == 'http://www.openlinksw.com/schemas/virtrdf#Geometry')) { //skip subproperties & geometry type
 				continue;
 			}
 			props[j] = obj[i][j];
 			//console.log(props);
 		}
-		geojs[k++] = {"type": "Feature", "geometry": {"type": "Point", "coordinates": [Number(obj[i].wkt.value.split(" ")[0].slice(6)), Number(obj[i].wkt.value.split(" ")[1].slice(0,-1))]}, 'properties' : props};
+		geojs[k++] = { "type": "Feature", "geometry": { "type": "Point", "coordinates": [Number(obj[i].wkt.value.split(" ")[0].slice(6)), Number(obj[i].wkt.value.split(" ")[1].slice(0, -1))] }, 'properties': props };
 	}
 	//console.log(geojs);
-	geojs = {"type": "FeatureCollection", "features": geojs};
-	if (typeof(Storage) !== "undefined") { // If Browser supports the localStorage/sessionStorage
+	geojs = { "type": "FeatureCollection", "features": geojs };
+	if (typeof (Storage) !== "undefined") { // If Browser supports the localStorage/sessionStorage
 		sessionStorage.setItem('result_'.concat(++no), JSON.stringify(geojs));
 	} else { //No Web Storage support
 		printError('Your browser does not support Web Storage API. Export of data will not be available!');
@@ -649,7 +649,7 @@ function preprocess(arr) {
 function exportHandler(e) {
 	e.preventDefault();
 	var objs = e.target.parentNode.childNodes;
-	for(var i = 0; i < objs.length; i++) {
+	for (var i = 0; i < objs.length; i++) {
 		objs[i].style.display = 'inline-block';
 	}
 	e.target.style.display = 'none';
@@ -658,24 +658,24 @@ function exportHandler(e) {
 function saveData(e) {
 	e.preventDefault();
 	var objs = this.childNodes;
-	for(var i = 0; i < objs.length; i++) {
+	for (var i = 0; i < objs.length; i++) {
 		objs[i].style.display = 'none';
 	}
 	this.getElementsByTagName("BUTTON")[0].style.display = 'inline-block';
 	var resultset = this.id;
-	switch(this.type.value) {
+	switch (this.type.value) {
 		case 'geojson':
-			dataBlob = new Blob([sessionStorage.getItem(resultset)], {type: "application/sgeo+json;charset=utf-8"})
+			dataBlob = new Blob([sessionStorage.getItem(resultset)], { type: "application/sgeo+json;charset=utf-8" })
 			saveAs(dataBlob, 'points_' + resultset + '.geojson');
 			break;
 		case 'gpx':
 			var gpx = togpx(JSON.parse(sessionStorage.getItem(resultset)));
-			dataBlob = new Blob([gpx], {type: "application/gpx+xml;charset=utf-8"})
+			dataBlob = new Blob([gpx], { type: "application/gpx+xml;charset=utf-8" })
 			saveAs(dataBlob, 'points_' + resultset + '.gpx');
 			break;
 		case 'kml':
-			var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)), {documentName: 'Points of interest', documentDescription: 'Generated by Smart Tourist Guide', name: 'name.value'});
-			dataBlob = new Blob([kml], {type: "application/vnd.google-earth.kml+xml;charset=utf-8"})
+			var kml = tokml(JSON.parse(sessionStorage.getItem(resultset)), { documentName: 'Points of interest', documentDescription: 'Generated by Smart Tourist Guide', name: 'name.value' });
+			dataBlob = new Blob([kml], { type: "application/vnd.google-earth.kml+xml;charset=utf-8" })
 			saveAs(dataBlob, 'points_' + resultset + '.kml');
 			break;
 		default:
@@ -685,15 +685,15 @@ function saveData(e) {
 
 //distinct things and their links <-- too complex, too generic, needs refactoring
 function thingsAndLinks(arr) {
-	if(! (arr instanceof Array)) {console.log("no way!"); return;}
-	var newA = [[0],[0]];
+	if (!(arr instanceof Array)) { console.log("no way!"); return; }
+	var newA = [[0], [0]];
 	var j = 0;
-	for(var i = 0; i < arr.length; i++) {
-	//console.log(arr[i].substring(0,4));
-		if(arr[i].substring(0,4) == 'link') {
+	for (var i = 0; i < arr.length; i++) {
+		//console.log(arr[i].substring(0,4));
+		if (arr[i].substring(0, 4) == 'link') {
 			newA[0][j] = arr[i];
 		}
-		else if(arr[i].substring(0,3) == 'wkt') {
+		else if (arr[i].substring(0, 3) == 'wkt') {
 		}
 		else {
 			newA[1][j++] = arr[i];
@@ -704,13 +704,13 @@ function thingsAndLinks(arr) {
 }
 
 function runProgressbar(name) {
-	$( "#" + name ).progressbar({
+	$("#" + name).progressbar({
 		value: false
 	});
 }
 
 function killProgressbar(name) {
-	$( "#" + name ).progressbar( "destroy" );
+	$("#" + name).progressbar("destroy");
 }
 
 /**
@@ -723,10 +723,10 @@ function parseWeather(obj) {
 	var weatherArr = []; //each row has [date of origin time, origin time, symbol, minT, maxT]
 	var j = 0;
 	var fromH = Number(pointData[0].time.split('T')[1].split(':')[0])
-	for(var i = 0; i < pointData.length && j < 8; i++) {
+	for (var i = 0; i < pointData.length && j < 8; i++) {
 		var toH = Number(pointData[i].time.split('T')[1].split(':')[0]);
 		toH < 6 ? toH = toH + 24 : null;
-		if (toH-fromH != 6) {
+		if (toH - fromH != 6) {
 			continue;
 		}
 		var t = pointData[i].data;
@@ -751,13 +751,13 @@ function navigateTo(e) {
 function filter(e) {
 	var cat = e.target.value;
 	var lines = document.getElementsByClassName(cat);
-	if(lines[0] && lines[0].style.display != 'none') {
-		for(var i = 0; i < lines.length; i++) {
+	if (lines[0] && lines[0].style.display != 'none') {
+		for (var i = 0; i < lines.length; i++) {
 			lines[i].style.display = 'none';
 		}
 	}
 	else {
-		for(var i = 0; i < lines.length; i++) {
+		for (var i = 0; i < lines.length; i++) {
 			lines[i].style.display = 'table-row';
 		}
 	}
@@ -768,15 +768,15 @@ function filter(e) {
  */
 function filterAll(show) {
 	var tables = document.getElementsByClassName("table-results");
-	for(var i = 0; i < tables.length; i++) {
+	for (var i = 0; i < tables.length; i++) {
 		var lines = tables[i].getElementsByTagName("TR");
-		if(show) {
-			for(var j = 1; j < lines.length; j++) { //skip heading
+		if (show) {
+			for (var j = 1; j < lines.length; j++) { //skip heading
 				lines[j].style.display = 'table-row';
 			}
 		}
 		else {
-			for(var j = 1; j < lines.length; j++) { //skip heading
+			for (var j = 1; j < lines.length; j++) { //skip heading
 				lines[j].style.display = 'none';
 			}
 		}
@@ -784,7 +784,7 @@ function filterAll(show) {
 }
 
 function restoreDefaultValues() {
-	if(presets) {
+	if (presets) {
 		document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
 		var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
 		inputs[0].value = presets.defaultLatLon[1];
@@ -793,7 +793,7 @@ function restoreDefaultValues() {
 		document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
 	}
 	else {
-		$.getJSON('presets.json', function(data) {
+		$.getJSON('presets.json', function (data) {
 			presets = data.presets;
 			document.getElementById('search-by-name').getElementsByTagName('INPUT')[0].value = presets.defaultPlace;
 			var inputs = document.getElementById('search-by-latlon').getElementsByTagName('INPUT');
@@ -802,7 +802,7 @@ function restoreDefaultValues() {
 			inputs[2].value = presets.defaultLatLon[2];
 			document.getElementById('search-by-position').getElementsByTagName('INPUT')[0].value = presets.defaultRadius;
 			//console.log(presets);
-		}).fail(function(jqXHR, status, err) {
+		}).fail(function (jqXHR, status, err) {
 			console.log("Failed to load preset values: " + status + " " + err);
 		});
 	}
@@ -812,7 +812,7 @@ function restoreDefaultValues() {
  * Extends the implicit setAttribute() fction with ability to just append the new value if the attribute already exists
  **/
 function appendAttribute(elem, attr, newValue) {
-	if(elem.hasAttribute(attr)) {
+	if (elem.hasAttribute(attr)) {
 		elem.setAttribute(attr, elem.getAttribute(attr) + ' ' + newValue);
 	}
 	else {
@@ -830,7 +830,7 @@ function xmlToJson(xml) {
 	if (xml.nodeType == 1) { // element
 		// do attributes
 		if (xml.attributes.length > 0) {
-		obj["@attributes"] = {};
+			obj["@attributes"] = {};
 			for (var j = 0; j < xml.attributes.length; j++) {
 				var attribute = xml.attributes.item(j);
 				obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
@@ -842,13 +842,13 @@ function xmlToJson(xml) {
 
 	// do children
 	if (xml.hasChildNodes()) {
-		for(var i = 0; i < xml.childNodes.length; i++) {
+		for (var i = 0; i < xml.childNodes.length; i++) {
 			var item = xml.childNodes.item(i);
 			var nodeName = item.nodeName;
-			if (typeof(obj[nodeName]) == "undefined") {
+			if (typeof (obj[nodeName]) == "undefined") {
 				obj[nodeName] = xmlToJson(item);
 			} else {
-				if (typeof(obj[nodeName].push) == "undefined") {
+				if (typeof (obj[nodeName].push) == "undefined") {
 					var old = obj[nodeName];
 					obj[nodeName] = [];
 					obj[nodeName].push(old);
@@ -870,19 +870,19 @@ function printError(text) {
 
 function animateBox(obj) {
 	obj.childNodes[5].style.display = 'inline-block';
-	if(obj.childNodes[10]) { //if there is elem[10] = digest of results, there is also elem[8] = progressbar for digest
+	if (obj.childNodes[10]) { //if there is elem[10] = digest of results, there is also elem[8] = progressbar for digest
 		obj.childNodes[8].style.display = 'inline-block';
 		obj.childNodes[10].style.display = 'inline-block';
 	}
 	obj.childNodes[1].style.display = 'none';
 	//console.log(obj.childNodes);
 	var forms = document.getElementsByTagName("FORM");
-	for(var i = 0; i < 3; i++) {
-		if(forms[i].id != obj.childNodes[5].id) {
+	for (var i = 0; i < 3; i++) {
+		if (forms[i].id != obj.childNodes[5].id) {
 			forms[i].style.display = 'none';
 			//console.log(forms[i].parentNode.childNodes[1]);
 			forms[i].parentNode.childNodes[1].style.display = 'inline-block';
-			if(forms[i].parentNode.childNodes[10]) {
+			if (forms[i].parentNode.childNodes[10]) {
 				forms[i].parentNode.childNodes[8].style.display = 'none';
 				forms[i].parentNode.childNodes[10].style.display = 'none';
 			}
@@ -890,99 +890,99 @@ function animateBox(obj) {
 	}
 }
 
-function moveToMap(){
+function moveToMap() {
 	$('html, body').animate({
 		scrollTop: $("#scroll-to").offset().top
 	}, 1000);
 }
 
-function drawMarkers(list, input){
-    var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
-    var colorFallback = 'rgb('+ Math.floor((Math.random() * 250) + 1)+', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
-    for(var l = 0; l < list.length; l++){
-        
-        if(no < 12){
-            if(list[l]['mainCategory'] == "transportation"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-info>"+list[l]['subCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(transportation2);
-                num1++;
-            }
-             if(list[l]['mainCategory'] == "food and drink"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(foodAndDrink2);
-                num2++;
-            }
-             if(list[l]['mainCategory'] == "car service"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(carService2);
-                num3++;
-            }
-             if(list[l]['mainCategory'] == "culture and entertainment"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(cultureAndEntertainment2);
-                num4++;
-            }
-             if(list[l]['mainCategory'] == "lodging"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-info>"+list[l]['subCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(lodging2);
-                num5++;
-            }
-             if(list[l]['mainCategory'] == "natural feature"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(naturalFeature2);
-                num6++;
-            }
-             if(list[l]['mainCategory'] == "other"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(other2);
-                num7++;
-            }
-             if(list[l]['mainCategory'] == "outdoor"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(outdoor2);
-                num8++;
-            }
-             if(list[l]['mainCategory'] == "professional and public"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(professionalAndPublic2);
-                num9++;
-            }
-             if(list[l]['mainCategory'] == "shopping and service"){
-                var s = L.marker([list[l]['lat'], list[l]['long']], {icon: color[no]});
-                s.bindPopup("<div class=popup-title>"+list[l]['title']+"</div><div class=popup-info>"+Math.round((list[l]['lat'])*1000)/1000+" "+Math.round((list[l]['long'])*1000)/1000+"</div><div class=popup-info>"+list[l]['mainCategory']+"</div><div class=popup-link><a href=#"+list[l]['name']+">Table info<a/></div>");
-                s.addTo(shoppingAndService2);
-                num10++;
-            }
+function drawMarkers(list, input) {
+	var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
+	var colorFallback = 'rgb(' + Math.floor((Math.random() * 250) + 1) + ', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
+	for (var l = 0; l < list.length; l++) {
+
+		if (no < 12) {
+			if (list[l]['mainCategory'] == "transportation") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-info>" + list[l]['subCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(transportation2);
+				num1++;
+			}
+			if (list[l]['mainCategory'] == "food and drink") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(foodAndDrink2);
+				num2++;
+			}
+			if (list[l]['mainCategory'] == "car service") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(carService2);
+				num3++;
+			}
+			if (list[l]['mainCategory'] == "culture and entertainment") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(cultureAndEntertainment2);
+				num4++;
+			}
+			if (list[l]['mainCategory'] == "lodging") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-info>" + list[l]['subCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(lodging2);
+				num5++;
+			}
+			if (list[l]['mainCategory'] == "natural feature") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(naturalFeature2);
+				num6++;
+			}
+			if (list[l]['mainCategory'] == "other") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(other2);
+				num7++;
+			}
+			if (list[l]['mainCategory'] == "outdoor") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(outdoor2);
+				num8++;
+			}
+			if (list[l]['mainCategory'] == "professional and public") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(professionalAndPublic2);
+				num9++;
+			}
+			if (list[l]['mainCategory'] == "shopping and service") {
+				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
+				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.addTo(shoppingAndService2);
+				num10++;
+			}
 		}
-		else{
+		else {
 			//var s = L.circleMarker([list[l]['lat'], list[l]['long']], {radius: 7, color: colorFallback});
-            { alert('Reached maximum number of results! (11) Please refresh the page and start a new search...'); }
-            break;
+			{ alert('Reached maximum number of results! (11) Please refresh the page and start a new search...'); }
+			break;
 		}
-    }
+	}
 
-    markersCluster.addLayer(transportation2);
-    markersCluster.addLayer(foodAndDrink2);
-    markersCluster.addLayer(carService2);
-    markersCluster.addLayer(cultureAndEntertainment2);
-    markersCluster.addLayer(lodging2);
-    markersCluster.addLayer(naturalFeature2);
-    markersCluster.addLayer(other2);
-    markersCluster.addLayer(outdoor2);
-    markersCluster.addLayer(professionalAndPublic2);
-    markersCluster.addLayer(shoppingAndService2);
-    
-    mymap.addLayer(markersCluster);
+	markersCluster.addLayer(transportation2);
+	markersCluster.addLayer(foodAndDrink2);
+	markersCluster.addLayer(carService2);
+	markersCluster.addLayer(cultureAndEntertainment2);
+	markersCluster.addLayer(lodging2);
+	markersCluster.addLayer(naturalFeature2);
+	markersCluster.addLayer(other2);
+	markersCluster.addLayer(outdoor2);
+	markersCluster.addLayer(professionalAndPublic2);
+	markersCluster.addLayer(shoppingAndService2);
 
-    refreshLayer(input);
+	mymap.addLayer(markersCluster);
+
+	refreshLayer(input);
 }
 
