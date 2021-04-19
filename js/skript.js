@@ -9,6 +9,7 @@ var no; //number of searches made during one session
 var destination = null;
 var cats = false;
 var presets; //default form inputs
+var UAIdentification = 'Smart-tourist-guide github.com/jmacura/Smart-tourist-guide';
 
 //defining Event Handlers
 $(document).ready(function(e) {
@@ -66,7 +67,12 @@ function searchPlaceGeoNames(e) {
 	var url = (location.protocol == 'https:') ? 'https://api.geonames.org/searchJSON' : 'http://api.geonames.org/searchJSON'; //? GeoNames has no HTTPS for free accounts!!
 	var queryUrl = url+'?q='+encodeURIComponent(place)+'&fuzzy=0.8&isNameRequired=true&username=spoi';
 	$.ajax({
+		headers: {
+			//"User-Agent": UAIdentification,
+			"Origin": UAIdentification
+		},
 		dataType: 'json',
+		crossDomain: true,
 		url: queryUrl,
 		success: function(data) {
 			//console.log(data);
@@ -314,7 +320,6 @@ function showInfo(input, headers, points) { //points is the array of data
 	charts.appendChild(forecast);
 	yrNoUrl = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=' + input[0] + '&lon=' + input[1];
 	//phpUrl = 'predpoved2.xml'; //ONLY FOR LOCAL TESTINGS
-	UAIdentification = 'Smart-tourist-guide github.com/jmacura/Smart-tourist-guide'
 	$.ajax({
 		headers: {
 			//"User-Agent": UAIdentification,
