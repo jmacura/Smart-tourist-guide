@@ -720,7 +720,6 @@ function parseWeather(obj) {
 	for(var i = 0; i < pointData.length && j < 8; i++) {
 		var toH = Number(pointData[i].time.split('T')[1].split(':')[0]);
 		toH < 6 ? toH = toH + 24 : null;
-		console.log(fromH, toH);
 		if (toH-fromH != 6) {
 			continue;
 		}
@@ -728,9 +727,8 @@ function parseWeather(obj) {
 		var d = pointData[i].time.split('T')[0].slice(5);
 		weatherArr[j++] = [d, fromH, t.next_6_hours.summary.symbol_code, 0, t.instant.details.air_temperature]; //array of length 8 ???
 		fromH = toH > 24 ? toH - 24 : toH;
-		console.log(weatherArr[j-1]);
+		//console.log(weatherArr[j-1]);
 	}
-	console.log(weatherArr.length);
 	return weatherArr;
 }
 
