@@ -51,7 +51,7 @@ th a {float: right;}
 .tmin {color: blue;}
 .tmax {color: red;}
 
-#catFilter {float: right; border: 0.3em solid rgb(0, 142, 214); width: 20%; display: none;}
+#catFilter {float: right; border: 0.3em solid rgb(0, 142, 214); width: 20%}
 /*#catFilter:hover {visibility: visible;}*/
 
 #content {margin-top: 0px; padding-bottom: 30px; max-width: 100%; color: #555555;}

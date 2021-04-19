@@ -206,9 +206,16 @@ function searchLocation(input) {
 
 // **** Get the list of Categories (Classes) from static file ****
 function getCats() {
-	if(cats) {return;};
-	cats = true;
-	document.getElementById("catFilter").style.display = 'block';
+	//document.getElementById("catFilter").style.display = 'block';
+	//NOTE: hidden/show replaced by d-none/d-block in newer Bootstrap versions
+	if ($("#catFilter").hasClass('hidden')) {
+		$("#catFilter").removeClass('hidden')
+		$("#catFilter").addClass('show')
+	} else {
+		$("#catFilter").removeClass('show')
+		$("#catFilter").addClass('hidden')
+	}
+	if (cats) {return;};
 	runProgressbar('catProgress');
 	/**
 	 * This part was used to get the data from SPARQL endpoint on-the-fly
@@ -227,6 +234,7 @@ function getCats() {
 		},
 		success: function(data) {//*/
 	$.getJSON('classes.json', function(data) {
+			cats = true;
 			//console.log(data);
 			var catz = data.results;
 			var catFilter = document.getElementById("catFilter");
@@ -384,6 +392,7 @@ function showInfo(input, headers, points) { //points is the array of data
 //Category filtering
 	var catFilter = document.createElement("DIV");
 	catFilter.setAttribute("id", 'catFilter');
+	catFilter.setAttribute("class", 'hidden');
 	var catProg = document.createElement("DIV");
 	catProg.setAttribute("class", 'progressbar');
 	catProg.setAttribute("id", 'catProgress');
