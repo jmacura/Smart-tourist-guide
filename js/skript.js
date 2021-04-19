@@ -7,7 +7,7 @@
 // global variables
 var no; //number of searches made during one session
 var destination = null;
-var cats = false;
+var cats = null;
 var presets; //default form inputs
 var UAIdentification = 'Smart-tourist-guide github.com/jmacura/Smart-tourist-guide';
 
@@ -215,7 +215,10 @@ function getCats() {
 		$("#catFilter").removeClass('show')
 		$("#catFilter").addClass('hidden')
 	}
-	if (cats) {return;};
+	if (cats) {
+		showCats();
+		return;
+	};
 	runProgressbar('catProgress');
 	/**
 	 * This part was used to get the data from SPARQL endpoint on-the-fly
@@ -234,10 +237,17 @@ function getCats() {
 		},
 		success: function(data) {//*/
 	$.getJSON('classes.json', function(data) {
-			cats = true;
+			cats = data.results;
 			//console.log(data);
-			var catz = data.results;
-			var catFilter = document.getElementById("catFilter");
+			showCats();
+	}).fail(function(jqXHR, status, err) {
+		printError("Failed to get category list: " + status + " " + err);
+		killProgressbar('catProgress');
+	});
+}
+
+function showCats() {
+	var catFilter = document.getElementById("catFilter");
 			var h = document.createElement("H3");
 			h.appendChild(document.createTextNode("Select/deselect categories to display"));
 			catFilter.appendChild(h);
@@ -256,11 +266,11 @@ function getCats() {
 			ls.appendChild(em);
 			ls.appendChild(document.createElement("BR"));
 			var cat = '';
-			for(var i = 0; i < catz.length; i++) {
-				if(cat == catz[i].mainClass.value.slice(32)) {
+			for(var i = 0; i < cats.length; i++) {
+				if(cat == cats[i].mainClass.value.slice(32)) {
 					continue;
 				}
-				cat = catz[i].mainClass.value.slice(32);
+				cat = cats[i].mainClass.value.slice(32);
 				//console.log(cat);
 				var li = document.createElement("INPUT");
 				li.setAttribute("type", 'checkbox');
@@ -276,10 +286,6 @@ function getCats() {
 			killProgressbar('catProgress');
 			//showInfo(input, data.head.vars, POIs);
 			//killProgressbar("resultsLoader");
-	}).fail(function(jqXHR, status, err) {
-		printError("Failed to get category list: " + status + " " + err);
-		killProgressbar('catProgress');
-	});
 }
 
 // **** Background support for displaying info ****
