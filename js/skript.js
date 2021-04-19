@@ -176,12 +176,13 @@ function searchLocation(input) {
 	//var url = (location.protocol == 'https:') ? 'https://data.plan4all.eu/sparql' : 'http://data.plan4all.eu/sparql';
 	var url = (location.protocol == 'https:') ? 'https://www.foodie-cloud.org/sparql' : 'https://www.foodie-cloud.org/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
-		"SELECT ?linkThing ?name ?sg AS ?wkt ?category FROM\n" +
+		"SELECT ?linkThing ?name ?sg AS ?wkt ?category ?photo FROM\n" +
 		"<http://www.sdi4apps.eu/poi.rdf> WHERE {\n" +
 		"?linkThing ogcgs:asWKT ?sg;\n" +
 		" rdfs:label ?name.\n" +
 		" FILTER(bif:st_intersects (?sg, bif:st_point (" + input[1] + ", " + input[0] + "), " + input[2] + ")).\n" +
 		" OPTIONAL {?linkThing a ?category .}\n" +
+		" OPTIONAL {?linkThing rdfs:seeAlso ?photo}\n" +
 		"}";
 	console.log(query);
 	var queryUrl = url + '?query=' + encodeURIComponent(query) + '&format=json&callback=?';
@@ -243,6 +244,7 @@ function getCats() {
 		cats = data.results;
 		//console.log(data);
 		createCats();
+		killProgressbar('catProgress');
 	}).fail(function (jqXHR, status, err) {
 		printError("Failed to get category list: " + status + " " + err);
 		killProgressbar('catProgress');
@@ -286,7 +288,6 @@ function createCats() {
 		ls.appendChild(document.createElement("BR"));
 	}
 	catFilter.appendChild(ls);
-	killProgressbar('catProgress');
 	//showInfo(input, data.head.vars, POIs);
 	//killProgressbar("resultsLoader");
 }
