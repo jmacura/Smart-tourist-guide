@@ -176,13 +176,13 @@ function searchLocation(input) {
 	//var url = (location.protocol == 'https:') ? 'https://data.plan4all.eu/sparql' : 'http://data.plan4all.eu/sparql';
 	var url = (location.protocol == 'https:') ? 'https://www.foodie-cloud.org/sparql' : 'https://www.foodie-cloud.org/sparql';
 	var query = "PREFIX poi: <http://www.openvoc.eu/poi#>\n" +
-		"SELECT ?linkThing ?name ?sg AS ?wkt ?category ?photo FROM\n" +
+		"SELECT ?linkThing ?name ?sg AS ?wkt ?category ?image FROM\n" +
 		"<http://www.sdi4apps.eu/poi.rdf> WHERE {\n" +
 		"?linkThing ogcgs:asWKT ?sg;\n" +
 		" rdfs:label ?name.\n" +
 		" FILTER(bif:st_intersects (?sg, bif:st_point (" + input[1] + ", " + input[0] + "), " + input[2] + ")).\n" +
 		" OPTIONAL {?linkThing a ?category .}\n" +
-		" OPTIONAL {?linkThing rdfs:seeAlso ?photo}\n" +
+		" OPTIONAL {?linkThing rdfs:seeAlso ?image .}\n" +
 		"}";
 	console.log(query);
 	var queryUrl = url + '?query=' + encodeURIComponent(query) + '&format=json&callback=?';
@@ -190,7 +190,7 @@ function searchLocation(input) {
 		dataType: 'json',
 		url: queryUrl,
 		success: function (data) {
-			//console.log(data);
+			console.log(data);
 			var POIs = preprocess(data.results.bindings);
 			mymap.setView([input[0], input[1]], 13);
 			showInfo(input, data.head.vars, POIs);
@@ -356,7 +356,6 @@ function showInfo(input, headers, points) { //points is the array of data
 			forecast.appendChild(p);
 		},
 		success: function (data) {
-			console.log(data);
 			var weather = parseWeather(data); //<- implement var [[day, time, symb, minT, maxT]] = parseWeather() ??
 			//console.log(weather);
 			var h = document.createElement("H3");
@@ -449,11 +448,12 @@ function showInfo(input, headers, points) { //points is the array of data
 		var latlng = points[i]['wkt'].value.split(" ");  //get lat and long from WKT
 		//console.log(latlng);
 
-		var markerObject = { lat: "", long: "", title: "", name: "", mainCategory: "", subCategory: "", list: "" }; // objekt reprezentující marker
+		var markerObject = { lat: "", long: "", title: "", name: "", mainCategory: "", subCategory: "", image: "", list: "" }; // object representing a marker
 		markerObject.lat = latlng[1].slice(0, -1);
 		markerObject.long = latlng[0].slice(6);
 		markerObject.title = objName2;
 		markerObject.name = objName;
+		markerObject.image = points[i]['image'] !== undefined && (points[i]['image'].value.endsWith('jpg') || points[i]['image'].value.endsWith('png')) ? points[i]['image'].value : "";
 		markerObject.list = points[i]['category'].list;
 
 		if (typeof points[i]['category'].list !== 'undefined') {
@@ -503,7 +503,9 @@ m.name = objName;
 			//console.log(j, heads[1][j]);
 			var txt = '';
 			//console.log(points[i][heads[1][j]]);
-			if (points[i][heads[1][j]].list) {
+			if (!points[i][heads[1][j]]) {
+				txt = '---';
+			} else if (points[i][heads[1][j]].list) {
 				//If there is more then 1 category, then they are in the list attribute
 				for (var k = 0; k < points[i][heads[1][j]].list.length; k++) {
 					if (txt.length > 1) {
@@ -515,11 +517,10 @@ m.name = objName;
 			} else if (points[i][heads[1][j]].value.includes('#')) { //If the line contains # sign => it is a single category
 				appendAttribute(r, "class", points[i][heads[1][j]].value.slice(32)); // if there is a category for given point => save it to the class attribute of corresponding row
 				txt = points[i][heads[1][j]].value.slice(32).replace(/_/g, ' '); //Prettyprint categories
-			}
-			else {
+			} else {
 				txt = points[i][heads[1][j]].value; // If the object has no name => print ---
 			}
-			t = document.createTextNode((points[i][heads[1][j]]) ? txt : '---');
+			t = document.createTextNode(txt);
 			if (heads[0][j]) {
 				l = document.createElement("A");
 				l.setAttribute("href", points[i][heads[0][j]].value);
@@ -904,65 +905,70 @@ function drawMarkers(list, input) {
 	var color = ['', blueIcon, greenIcon, redIcon, purpleIcon, yellowIcon, orangeIcon, greyIcon, azureIcon, ochreIcon, pinkIcon, blackIcon];
 	var colorFallback = 'rgb(' + Math.floor((Math.random() * 250) + 1) + ', ' + Math.floor((Math.random() * 250) + 1) + ', 61)';
 	for (var l = 0; l < list.length; l++) {
-
+		
 		if (no < 12) {
+			var popUpContent = "<div class=popup-title>" + list[l]['title'] + "</div>" +
+				(list[l]['image'] ? "<div class=popup-info><img src='" + list[l]['image'] + "'></div>" : "") +
+				"<div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div>" +
+				"<div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>";
+			var popUpContentWithSubCat = "<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-info>" + list[l]['subCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>";
 			if (list[l]['mainCategory'] == "transportation") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-info>" + list[l]['subCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContentWithSubCat);
 				s.addTo(transportation2);
 				num1++;
 			}
 			if (list[l]['mainCategory'] == "food and drink") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(foodAndDrink2);
 				num2++;
 			}
 			if (list[l]['mainCategory'] == "car service") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(carService2);
 				num3++;
 			}
 			if (list[l]['mainCategory'] == "culture and entertainment") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(cultureAndEntertainment2);
 				num4++;
 			}
 			if (list[l]['mainCategory'] == "lodging") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-info>" + list[l]['subCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContentWithSubCat);
 				s.addTo(lodging2);
 				num5++;
 			}
 			if (list[l]['mainCategory'] == "natural feature") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(naturalFeature2);
 				num6++;
 			}
 			if (list[l]['mainCategory'] == "other") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(other2);
 				num7++;
 			}
 			if (list[l]['mainCategory'] == "outdoor") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(outdoor2);
 				num8++;
 			}
 			if (list[l]['mainCategory'] == "professional and public") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(professionalAndPublic2);
 				num9++;
 			}
 			if (list[l]['mainCategory'] == "shopping and service") {
 				var s = L.marker([list[l]['lat'], list[l]['long']], { icon: color[no] });
-				s.bindPopup("<div class=popup-title>" + list[l]['title'] + "</div><div class=popup-info>" + Math.round((list[l]['lat']) * 1000) / 1000 + " " + Math.round((list[l]['long']) * 1000) / 1000 + "</div><div class=popup-info>" + list[l]['mainCategory'] + "</div><div class=popup-link><a href=#" + list[l]['name'] + ">Table info<a/></div>");
+				s.bindPopup(popUpContent);
 				s.addTo(shoppingAndService2);
 				num10++;
 			}
