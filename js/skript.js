@@ -351,7 +351,7 @@ function showInfo(input, headers, points) { //points is the array of data
 				p.appendChild(document.createTextNode(weather[i][0].slice(3,5) == new Date().getDate() ? 'today' : weather[i][0])) //day
 				d.appendChild(p);
 				p = document.createElement("P");
-				var printtime = weather[i][1] + '–' + (weather[i][1]+6); //forecasted time interval
+				var printtime = weather[i][1] + '–' + (weather[i][1]+6 > 24 ? weather[i][1]+6-24 : weather[i][1]+6); //forecasted time interval
 				p.appendChild(document.createTextNode(printtime));
 				d.appendChild(p);
 				//var img = document.createElement("IMG"); //image of weather condition
@@ -707,11 +707,18 @@ function parseWeather(obj) {
 	var pointData = obj.properties.timeseries;
 	var weatherArr = []; //each row has [date of origin time, origin time, symbol, minT, maxT]
 	var j = 0;
+	var fromH = Number(pointData[0].time.split('T')[1].split(':')[0])
 	for(var i = 0; i < pointData.length && j < 8; i++) {
+		var toH = Number(pointData[i].time.split('T')[1].split(':')[0]);
+		toH < 6 ? toH = toH + 24 : null;
+		console.log(fromH, toH);
+		if (toH-fromH != 6) {
+			continue;
+		}
 		var t = pointData[i].data;
 		var d = pointData[i].time.split('T')[0].slice(5);
-		var fromH = Number(pointData[i].time.split('T')[1].split(':')[0]);
 		weatherArr[j++] = [d, fromH, t.next_6_hours.summary.symbol_code, 0, t.instant.details.air_temperature]; //array of length 8 ???
+		fromH = toH > 24 ? toH - 24 : toH;
 		console.log(weatherArr[j-1]);
 	}
 	console.log(weatherArr.length);
